@@ -1,0 +1,10 @@
+  redis:
+    hostName: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+    pool:
+      maxIdle: 6
+      minIdle: 4
+      maxTotal: 32
+      maxWaitMillis: 100
