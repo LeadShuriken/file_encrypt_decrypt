@@ -17,5 +17,5 @@ Decrypt Workflow;
 3. Service queries, removes and returns private_key to application.
 4. WebCrypto uses private, public key hash and decrypts file returning to user.
 
-![alt text](https://github.com/LeadShuriken/file_encrypt_decript/blob/master/EncFileShare.png?raw=true)
+![alt text](https://github.com/LeadShuriken/file_encrypt_decrypt/blob/master/EncFileShare.png?raw=true)
  
