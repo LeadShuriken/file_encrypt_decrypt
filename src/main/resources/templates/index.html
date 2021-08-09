@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Encrypto</title>
+
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css"> -->
+
+    <link rel="stylesheet"
+        th:href="@{/webjars/bootstrap/{version}/css/bootstrap.min.css(version=${@webJarsConfig.bootstrap})}" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+
+
+<body>
+    <div class="sidenav">
+        <div class="login-main-text">
+            <h2>Encrypto</h2>
+            <br>
+            <h4>File Encrypt/Decript Service</h4>
+            <br>
+            <h5>Encrypto Workflow:</h5>
+            <br>
+            <ul>
+                <li>User submits a file and a password for encryption</li>
+                <li>WebCrypto hashes the filename salted with the password and timestamp
+                </li>
+                <li>App passes it (hash filename) to the service</li>
+                <li>Service creates a private_key from filename</li>
+                <li>Service persists private_key, filename, timestamp</li>
+                <li>Service returns private_key to app</li>
+                <li>Webcrypto uses private_key,public_key hash and encrypts the file</li>
+            </ul>
+            <br>
+            <h5>Decrypt Workflow:</h5>
+            <br>
+            <ul>
+                <li>User submits a file and a password for dencryption.</li>
+                <li>App passes filename to service</li>
+                <li>Service queries, removes and returns private_key to application</li>
+                <li>WebCrypto uses private, public key hash and decrypts the file</li>
+            </ul>
+        </div>
+    </div>
+    <div class="main">
+        <div class="col-md-7 col-sm-12">
+            <div class="login-form">
+                <form class="needs-validation" novalidate>
+
+                    <div class="form-group">
+                        <label for="fileArea">Select file to encrypt/decript...</label>
+                        <div id="fileArea" class="input-group">
+                            <span class="input-group-btn">
+                                <span class="btn btn-info btn-file">
+                                    Browse&hellip; <input type="file" single>
+                                </span>
+                            </span>
+                            <input type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group low">
+                        <label for="textArea">Input password...</label>
+                        <textarea class="form-control" id="textArea" rows="3" disabled></textarea>
+                    </div>
+
+                    <div class="lower">
+                        <button type="button" onclick="encryptWorkflow()" class="btn btn-danger"
+                            disabled>Encrypt</button>
+                        <button type="button" onclick="decryptWorkflow()" class="btn btn-success"
+                            disabled>Decrypt</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+    <script src="script.js"></script> -->
+
+    <script th:src="@{/webjars/jquery/{version}/jquery.min.js(version=${@webJarsConfig.jquery})}"></script>
+    <script th:src="@{/webjars/bootstrap/{version}/js/bootstrap.min.js(version=${@webJarsConfig.bootstrap})}"></script>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+
+</html>

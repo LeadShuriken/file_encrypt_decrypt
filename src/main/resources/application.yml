@@ -11,3 +11,7 @@ redis:
 
 api:
   version: v1
+
+webjars:
+  bootstrap: "5.1.0"
+  jquery: "3.6.0"
