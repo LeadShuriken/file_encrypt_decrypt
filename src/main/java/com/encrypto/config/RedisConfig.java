@@ -32,8 +32,7 @@ public class RedisConfig {
     private String password;
     private Integer database;
     private Integer port;
-
-    private RedisPoolConfig pool;
+    private RedisPool pool;
 
     private RedisStandaloneConfiguration redisConfig() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
@@ -60,7 +59,7 @@ public class RedisConfig {
 
     @Bean
     @Primary
-    ReactiveRedisConnectionFactory reactiveRedisConnectionFactory() {
+    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory() {
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisConfig(), letuceConfig());
         lettuceConnectionFactory.setShareNativeConnection(false);
 

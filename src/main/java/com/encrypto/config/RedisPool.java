@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RedisPoolConfig {
+public class RedisPool {
 
     private Integer maxIdle;
     private Integer minIdle;

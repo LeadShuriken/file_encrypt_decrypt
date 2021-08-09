@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 
 import com.encrypto.model.FileStamp;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Component
@@ -25,7 +26,8 @@ public class DataLoader {
 	@PostConstruct
 	public void loadData() {
 		factory.getReactiveConnection().serverCommands().flushAll()
-				.thenMany(Flux.just("A", "B", "C").map(name -> new FileStamp(UUID.randomUUID().toString(), name, ""))
+				.thenMany(Flux.just("A", "B", "C")
+						.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", new Date()))
 						.flatMap(a -> opps.opsForValue().set(a.getId(), a)))
 				.thenMany(opps.keys("*").flatMap(opps.opsForValue()::get)).subscribe(System.out::println);
 	}
