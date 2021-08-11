@@ -57,7 +57,7 @@ body {
 }
 
 .login-main-text {
-    margin-top: 20%;
+    margin-top: 5%;
     padding: 60px;
     color: #fff;
 }
@@ -89,6 +89,10 @@ body {
     background: red;
     cursor: inherit;
     display: block;
+}
+
+#textArea {
+    resize: none;
 }
 
 input[readonly] {
