@@ -16,14 +16,6 @@ function download(data, filename, type) {
     }
 }
 
-async function hash(message) {
-    const msgUint8 = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-
 function convertStringToArrayBuffer(str) {
     var encoder = new TextEncoder("utf-8");
     return encoder.encode(str);
@@ -76,13 +68,13 @@ async function decryptMessage(key, data, iv) {
     ));
 }
 
-async function importKey(password) {
+async function importKey(password, events) {
     return await window.crypto.subtle.importKey(
         "raw",
         strToUint8Array(password),
         "AES-GCM",
         true,
-        ["encrypt", "decrypt"]
+        events
     );
 }
 

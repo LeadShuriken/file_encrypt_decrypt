@@ -37,7 +37,7 @@ $(document).ready(function () {
         const name = file.name;
         const type = file.type;
 
-        importKey(password).then(key => {
+        importKey(password, ["encrypt"]).then(key => {
             encryptMessage(key, name, iv)
                 .then(arrayBuffer => {
                     base64Name = arrayBufferToBase64(arrayBuffer);
@@ -51,10 +51,13 @@ $(document).ready(function () {
                         dataType: 'json',
                         data: JSON.stringify({
                             name,
+                            password,
                             iv
                         }),
-                        success: function () {
-                            worker.postMessage([file, iv, key, true]);
+                        success: res => {
+                            importKey(res.password, ["encrypt"]).then(key => {
+                                worker.postMessage([file, iv, key, true]);
+                            })
                         }
                     })
                 });
@@ -67,25 +70,25 @@ $(document).ready(function () {
         const name = file.name;
         const type = file.type;
 
-        importKey(password).then(key => {
-            $.ajax({
-                type: 'POST',
-                url: '/v1/decrypt',
-                contentType: "application/json",
-                dataType: 'json',
-                data: JSON.stringify({
-                    name: file
-                }),
-                success: function (result) {
-                    decryptMessage(key, name, result.iv).then(res => {
+        $.ajax({
+            type: 'POST',
+            url: '/v1/decrypt',
+            contentType: "application/json",
+            dataType: 'json',
+            data: JSON.stringify({
+                name: file,
+                password
+            }),
+            success: res => {
+                importKey(res.password, ["decrypt"]).then(key => {
+                    decryptMessage(key, name, res.iv).then(decr => {
                         worker.onmessage = function (evt) {
-                            download(evt.data, res, type)
+                            download(evt.data, decr, type)
                         };
-
-                        worker.postMessage([file, result.iv, key, false]);
+                        worker.postMessage([file, res.iv, key, false]);
                     })
-                }
-            })
+                })
+            }
         })
     });
 });
