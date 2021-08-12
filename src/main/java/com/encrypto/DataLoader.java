@@ -12,7 +12,7 @@ import com.encrypto.model.FileStamp;
 import java.util.Date;
 import java.util.UUID;
 
-@Component
+// @Component
 public class DataLoader {
 
 	private final ReactiveRedisConnectionFactory factory;
@@ -27,7 +27,8 @@ public class DataLoader {
 	public void loadData() {
 		factory.getReactiveConnection().serverCommands().flushAll()
 				.thenMany(Flux.just("A", "B", "C")
-						.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", new Date()))
+						.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", name + "_iv",
+								new Date()))
 						.flatMap(a -> opps.opsForValue().set(a.getId(), a)))
 				.thenMany(opps.keys("*").flatMap(opps.opsForValue()::get)).subscribe(System.out::println);
 	}

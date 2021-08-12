@@ -37,18 +37,20 @@ public class EncryptoController {
 
     @PostMapping("decrypt")
     public @ResponseBody Mono<FileStamp> decrypt(@Valid @RequestBody final FileStamp file) {
-        return opps.keys(file.getName()).flatMap(opps.opsForValue()::get).next().map(a -> {
-            opps.opsForValue().delete(a.getName());
-            return a;
-        });
+        return opps.keys(file.getName()).flatMap(opps.opsForValue()::get)
+                .filter(a -> enc.matches(file.getPassword(), a.getPassword()))
+                .flatMap(a -> opps.opsForValue().delete(a.getName()).then(Mono.just(a))).next();
     }
 
     @PostMapping("encrypt")
-    public @ResponseBody Mono<FileStamp> encrypt(@Valid @RequestBody final FileStamp nameStamp) {
-        return Mono.just(nameStamp.getName())
-                .map(i -> new FileStamp(UUID.randomUUID().toString(), i, enc.encode(i), new Date())).map(a -> {
-                    opps.opsForValue().set(a.getName(), a);
-                    return a;
-                });
+    public @ResponseBody Mono<FileStamp> encrypt(@Valid @RequestBody final FileStamp file) {
+        return Mono.just(file).map(i -> new FileStamp(enc.encode(i.getPassword())));
+    }
+
+    @PostMapping("store")
+    public @ResponseBody Mono<Boolean> store(@Valid @RequestBody final FileStamp file) {
+        return Mono.just(file).map(
+                i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), i.getPassword(), i.getIv(), new Date()))
+                .flatMap(a -> opps.opsForValue().set(a.getName(), a));
     }
 }

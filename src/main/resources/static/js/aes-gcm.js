@@ -61,7 +61,7 @@ async function decryptMessage(key, data, iv) {
     return convertArrayBuffertoString(await window.crypto.subtle.decrypt(
         {
             name: "AES-GCM",
-            iv
+            iv: iv
         },
         key,
         base64ToArrayBuffer(data)
