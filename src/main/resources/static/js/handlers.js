@@ -76,6 +76,7 @@ $(document).ready(function () {
         })
     });
 
+
     $("#decrypt").button().click(function () {
         const password = document.getElementById('textArea').value;
         const file = document.getElementById('fileinput').files[0];
@@ -96,7 +97,7 @@ $(document).ready(function () {
                     const iv = base64ToArrayBuffer(res.iv);
                     decryptMessage(key, name, iv).then(decr => {
                         worker.onmessage = (evt) => {
-                            download(evt.data, decr, type)
+                            download(evt.data, decr, type);
                         };
                         worker.postMessage([file, iv, key, false]);
                     })

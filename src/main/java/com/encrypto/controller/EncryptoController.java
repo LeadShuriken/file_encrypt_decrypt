@@ -49,8 +49,9 @@ public class EncryptoController {
 
     @PostMapping("store")
     public @ResponseBody Mono<Boolean> store(@Valid @RequestBody final FileStamp file) {
-        return Mono.just(file).map(
-                i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), i.getPassword(), i.getIv(), new Date()))
-                .flatMap(a -> opps.opsForValue().set(a.getName(), a));
+        return Mono.just(file)
+                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), i.getPassword(), i.getIv(),
+                        i.getExpiration(), new Date()))
+                .flatMap(a -> opps.opsForValue().set(a.getName(), a, a.getExpiration()));
     }
 }

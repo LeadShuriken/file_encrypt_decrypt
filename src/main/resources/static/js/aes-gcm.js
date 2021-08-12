@@ -1,3 +1,12 @@
+function flush() {
+    const textArea = document.getElementById('textArea');
+    textArea.disabled = true;
+    document.getElementById('fileinput').value = null;
+    document.getElementById('filename').value = null;
+    document.getElementById('encrypt').disabled = true;
+    document.getElementById('decrypt').disabled = true;
+}
+
 function download(data, filename, type) {
     var file = new Blob([data], { type: type });
     if (window.navigator.msSaveOrOpenBlob) // IE10+
@@ -12,6 +21,7 @@ function download(data, filename, type) {
         setTimeout(function () {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            flush();
         }, 0);
     }
 }

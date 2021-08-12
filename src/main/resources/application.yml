@@ -11,6 +11,9 @@ redis:
 
 api:
   version: v1
+  maxReqPerSec: 5
+  allowedOrigin: 'http://localhost:8080'
+  originFilter: /v1/get|/v1/decrypt|/v1/encrypt|/v1/store
 
 webjars:
   bootstrap: "5.1.0"
