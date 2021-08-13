@@ -9,8 +9,10 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.springframework.data.redis.core.RedisHash;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -24,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@RedisHash(timeToLive = 3600)
 public class FileStamp {
 
     @JsonProperty("id")
@@ -43,8 +44,11 @@ public class FileStamp {
     @Size(max = 100, min = 1)
     private String iv;
 
+    @NonNull
     @JsonProperty("expiration")
-    private Duration expiration;
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
+    private Duration expiration = Duration.ofHours(1);
 
     @Past
     @JsonProperty("atTime")

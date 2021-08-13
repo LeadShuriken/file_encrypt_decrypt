@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.core.annotation.Order;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Component("allowedOriginFilter")
+// @Component("allowedOriginFilter")
 public class ApiOriginFilter extends OncePerRequestFilter {
 
     @Autowired

@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
-// @Component
+@Component
 public class DataLoader {
 
 	private final ReactiveRedisConnectionFactory factory;
@@ -29,8 +29,8 @@ public class DataLoader {
 		factory.getReactiveConnection().serverCommands().flushAll()
 				.thenMany(Flux.just("A", "B", "C")
 						.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", name + "_iv",
-								Duration.ofHours(1), new Date()))
-						.flatMap(a -> opps.opsForValue().set(a.getId(), a)))
+								Duration.ofHours(2), new Date()))
+						.flatMap(a -> opps.opsForValue().set(a.getId(), a, a.getExpiration())))
 				.thenMany(opps.keys("*").flatMap(opps.opsForValue()::get)).subscribe(System.out::println);
 	}
 }
