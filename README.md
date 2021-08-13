@@ -2,7 +2,7 @@
 
 ## Description
 
-This app encrypts and decrypts files using the now widely supported [WebCrypt] API. The process or encryption/decryption is developed to leave no footprint, and have the service remain dumb to any information of the transaction while facilitating it aka user password, filename, file format. What the backend does, in fact, is simply store a WebCrypto initialization vector which must be unique for every encryption operation carried out with a given key. It also stores the operation password hash which is used to facilitate the process by being converted to a [CryptoKey] (aka a 'given key') after it has been identified as the password of the encryptor. Redis is used to allow for flat expiration times of tokens as well as because of developer convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt.
+This app encrypts and decrypts files using the now widely supported [WebCrypto] API. The process or encryption/decryption is developed to leave no footprint, and have the service remain dumb to any information of the transaction while facilitating it aka user password, filename, file format. What the backend does, in fact, is simply store a WebCrypto initialization vector which must be unique for every encryption operation carried out with a given key. It also stores the operation password hash which is used to facilitate the process by being converted to a [CryptoKey] (aka a 'given key') after it has been identified as the password of the encryptor. Redis is used to allow for flat expiration times of tokens as well as because of developer convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt.
 </br>
 </br>
 
@@ -58,7 +58,7 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   [REDIS]:<https://redis.io/>
   [LETUCE]:<https://lettuce.io/>
   [MAVEN]:<https://maven.apache.org/>
-  
+
   [LeadShuriken]: <https://github.com/LeadShuriken>
 
   [WebCrypto]:<https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API>
