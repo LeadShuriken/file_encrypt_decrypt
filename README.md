@@ -1,10 +1,8 @@
 # FILE-ENCRYPT-DECRYPT
 
-![alt text](https://github.com/LeadShuriken/file_encrypt_decrypt/blob/master/EncFileShare.jpg?raw=true)
-
 ## Description
 
-This app encrypts and decrypts files using the now widely supported [WebCrypt] API. The process or encryption/decryption is developed to leave no footprint, and have the service remain dumb to any information of the transaction while facilitating it aka user password, filename, file format. What the backend does, in fact, is simply store a WebCrypto initialization vector which must be unique for every encryption operation carried out with a given key. It also stores the operation password hash which is used to facilitate the process by being converted to a [CryptoKey](aka a 'given key') after it has been identified as the password of the encryptor. Redis is used to allow for flat expiration times of tokens as well as because of developer convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt.
+This app encrypts and decrypts files using the now widely supported [WebCrypt] API. The process or encryption/decryption is developed to leave no footprint, and have the service remain dumb to any information of the transaction while facilitating it aka user password, filename, file format. What the backend does, in fact, is simply store a WebCrypto initialization vector which must be unique for every encryption operation carried out with a given key. It also stores the operation password hash which is used to facilitate the process by being converted to a [CryptoKey] (aka a 'given key') after it has been identified as the password of the encryptor. Redis is used to allow for flat expiration times of tokens as well as because of developer convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt.
 </br>
 </br>
 
@@ -44,8 +42,12 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
 
 ### Todos
 
- - Tests and Docs
- - All stored procedures
+ - FE Expiration duration
+ - Update .JPG
+
+### Graph
+
+![alt text](https://github.com/LeadShuriken/file_encrypt_decrypt/blob/master/EncFileShare.jpg?raw=true)
 
   [JAVA11]:<https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>
   [SPRING-BOOT]:<https://spring.io/projects/spring-boot>
