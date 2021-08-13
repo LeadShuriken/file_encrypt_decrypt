@@ -36,46 +36,34 @@ $(document).ready(function () {
         const file = document.getElementById('fileinput').files[0];
         const name = file.name.split('.').slice(0, -1).join('.').replaceAll(' ', '_');
         const type = file.type;
-        $.ajax({
-            type: 'POST',
-            url: '/v1/encrypt',
-            contentType: "application/json",
-            dataType: 'json',
-            data: JSON.stringify({
-                password
-            }),
-            success: res => {
-                importKey(res.password, ["encrypt", "decrypt"]).then(key => {
-                    encryptMessage(key, name, iv)
-                        .then(arrayBuffer => {
-                            base64Name = arrayBufferToBase64(arrayBuffer);
-                            $.ajax({
-                                type: 'POST',
-                                url: '/v1/store',
-                                contentType: "application/json",
-                                dataType: 'json',
-                                data: JSON.stringify({
-                                    name: base64Name,
-                                    password: res.password,
-                                    iv: arrayBufferToBase64(iv)
-                                }),
-                                success: res2 => {
-                                    if (res2) {
-                                        worker.onmessage = (evt) => {
-                                            download(evt.data, base64Name, type)
-                                        };
-                                        importKey(res.password, ["encrypt", "decrypt"]).then(key => {
-                                            worker.postMessage([file, iv, key, true]);
-                                        })
-                                    }
-                                }
-                            })
-                        });
+        importKey(password, ["encrypt", "decrypt"]).then(key => {
+            encryptMessage(key, name, iv)
+                .then(arrayBuffer => {
+                    base64Name = arrayBufferToBase64(arrayBuffer);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/v1/encrypt',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            name: base64Name,
+                            password: password,
+                            iv: arrayBufferToBase64(iv)
+                        }),
+                        success: res2 => {
+                            if (res2) {
+                                worker.onmessage = (evt) => {
+                                    download(evt.data, base64Name, type)
+                                };
+                                importKey(password, ["encrypt", "decrypt"]).then(key => {
+                                    worker.postMessage([file, iv, key, true]);
+                                })
+                            }
+                        }
+                    })
                 });
-            }
-        })
-    });
-
+        });
+    })
 
     $("#decrypt").button().click(function () {
         const password = document.getElementById('textArea').value;
@@ -93,15 +81,17 @@ $(document).ready(function () {
                 name
             }),
             success: res => {
-                importKey(res.password, ["encrypt", "decrypt"]).then(key => {
-                    const iv = base64ToArrayBuffer(res.iv);
-                    decryptMessage(key, name, iv).then(decr => {
-                        worker.onmessage = (evt) => {
-                            download(evt.data, decr, type);
-                        };
-                        worker.postMessage([file, iv, key, false]);
+                if (res) {
+                    importKey(password, ["encrypt", "decrypt"]).then(key => {
+                        const iv = base64ToArrayBuffer(res.iv);
+                        decryptMessage(key, name, iv).then(decr => {
+                            worker.onmessage = (evt) => {
+                                download(evt.data, decr, type);
+                            };
+                            worker.postMessage([file, iv, key, false]);
+                        })
                     })
-                })
+                }
             }
         })
     });

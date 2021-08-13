@@ -49,14 +49,9 @@ public class EncryptoController {
     }
 
     @PostMapping("encrypt")
-    public @ResponseBody Mono<FileStamp> encrypt(@Valid @RequestBody final FileStamp file) {
-        return Mono.just(file).map(i -> new FileStamp(enc.encode(i.getPassword())));
-    }
-
-    @PostMapping("store")
     public @ResponseBody Mono<Boolean> store(@Valid @RequestBody final FileStamp file) {
         return Mono.just(file)
-                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), i.getPassword(), i.getIv(),
+                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), enc.encode(i.getPassword()), i.getIv(),
                         i.getExpiration(), new Date()))
                 .filter(a -> redisProps.getTtl().compareTo(a.getExpiration()) != -1)
                 .flatMap(a -> opps.opsForValue().set(a.getName(), a, a.getExpiration()));

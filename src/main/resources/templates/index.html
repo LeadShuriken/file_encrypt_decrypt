@@ -19,23 +19,29 @@
             <h5>Encrypto Workflow:</h5>
             <br>
             <ul>
-                <li>User submits a file and a password for encryption</li>
-                <li>WebCrypto hashes the filename salted with the password and timestamp
+                <li>User submits a file with a password for encryption.</li>
+                <li>Password is used to create a CryptoKey and generate a IV Vector.
                 </li>
-                <li>App passes it (hash filename) to the service</li>
-                <li>Service creates a private_key from filename</li>
-                <li>Service persists private_key, filename, timestamp</li>
-                <li>Service returns private_key to app</li>
-                <li>Webcrypto uses private_key,public_key hash and encrypts the file</li>
+                <li>Raw Vector and password are used to encrypt the filename (App), file (WebWorker).
+                </li>
+                <li>IV Vector in Base64, the encrypted name and password are sent to Service.
+                </li>
+                <li>Service hashes the password and stores the data while adding 'time to live' of 2 hours (FE TODO).
+                </li>
+                <li>File with a now encrypted name is downloaded to the client.
+                </li>
             </ul>
             <br>
             <h5>Decrypt Workflow:</h5>
             <br>
             <ul>
                 <li>User submits a file and a password for dencryption.</li>
-                <li>App passes filename to service</li>
-                <li>Service queries, removes and returns private_key to application</li>
-                <li>WebCrypto uses private, public key hash and decrypts the file</li>
+                <li>App passes password, file name(now hashed) to the service.</li>
+                <li>Service queries for the name and verifies the password hash.</li>
+                <li>Service removes the item and returns the IV Vector to the application.</li>
+                <li>WebCrypto uses the password and converted vector to decrypt the file.</li>
+                <li>File with a now decrypted name is downloaded to the client.
+                </li>
             </ul>
         </div>
     </div>
