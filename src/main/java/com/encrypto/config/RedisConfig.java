@@ -1,6 +1,7 @@
 package com.encrypto.config;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import org.springframework.context.annotation.Bean;
@@ -18,33 +19,28 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import lombok.Setter;
 import java.time.Duration;
 
 import com.encrypto.model.FileStamp;
 
-@Setter
 @Configuration
-@ConfigurationProperties(prefix = "redis")
 public class RedisConfig {
 
-    private String hostName;
-    private String password;
-    private Integer database;
-    private Integer port;
-    private RedisPool pool;
+    @Autowired
+    private RedisProps redisProps;
 
     private RedisStandaloneConfiguration redisConfig() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName(hostName);
-        config.setPort(port);
-        config.setDatabase(database);
-        config.setPassword(RedisPassword.of(password));
+        config.setHostName(redisProps.getHostName());
+        config.setPort(redisProps.getPort());
+        config.setDatabase(redisProps.getDatabase());
+        config.setPassword(RedisPassword.of(redisProps.getPassword()));
         return config;
     }
 
     private GenericObjectPoolConfig<LettuceClientConfiguration> redisPoolConfig() {
         GenericObjectPoolConfig<LettuceClientConfiguration> config = new GenericObjectPoolConfig<LettuceClientConfiguration>();
+        RedisPool pool = redisProps.getPool();
         config.setMaxTotal(pool.getMaxTotal());
         config.setMaxIdle(pool.getMaxIdle());
         config.setMinIdle(pool.getMinIdle());
