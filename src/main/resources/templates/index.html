@@ -26,7 +26,7 @@
                 </li>
                 <li>IV Vector in Base64, the encrypted name and password are sent to Service.
                 </li>
-                <li>Service hashes the password and stores the data while adding 'time to live' of 2 hours (FE TODO).
+                <li>Service hashes the password and stores the data adding the decrypt time.
                 </li>
                 <li>File with a now encrypted name is downloaded to the client.
                 </li>
@@ -64,7 +64,16 @@
 
                     <div class="form-group low">
                         <label for="textArea">Input password...</label>
-                        <textarea class="form-control" maxlength="32" id="textArea" rows="" disabled></textarea>
+                        <textarea class="form-control" maxlength="32" id="textArea" rows="2" disabled></textarea>
+                    </div>
+
+                    <div th:with="maxDuration=${@redisProps.ttlMax.toHours()}" class="form-group low">
+                        <div class='hours-set'>
+                            <label for="formControlRange">Hours to decrypt:&nbsp;</label><span id='rangeTime'
+                                th:text='${maxDuration}'></span>
+                        </div>
+                        <input disabled type="range" step="0.5" th:max="${maxDuration}" th:value="${maxDuration}"
+                            th:min="${@redisProps.ttlMin.toHours()}" class="form-control-range" id="formControlRange">
                     </div>
 
                     <div class="lower">

@@ -8,13 +8,20 @@ $(document).on('change', '.btn-file :file', function () {
 $(document).ready(function () {
     const worker = new Worker(getWorkerJS());
 
+    const buttons = $('button');
+    const textArea = $('textarea');
+    const rangeTime = $('#rangeTime');
+    const formControlRange = $('#formControlRange');
+
     $('textarea').bind('input propertychange',
         function () {
             if ($(this).val()) {
-                $('button').removeAttr('disabled');
+                buttons.removeAttr('disabled');
+                formControlRange.removeAttr('disabled');
             }
             else {
-                $('button').attr('disabled', true);
+                buttons.attr('disabled', true);
+                formControlRange.attr('disabled', true);
             }
         });
 
@@ -24,10 +31,14 @@ $(document).ready(function () {
 
         if (input.length) {
             input.val(log);
-            $('textarea').attr('disabled', false);
+            textArea.attr('disabled', false);
         } else {
             if (log) alert(log);
         }
+    });
+
+    formControlRange.on('change', function (event) {
+        rangeTime.text(event.target.value);
     });
 
     $("#encrypt").button().click(function () {
@@ -48,6 +59,7 @@ $(document).ready(function () {
                         data: JSON.stringify({
                             name: base64Name,
                             password: password,
+                            expiration: rangeTime.text() * 3600,
                             iv: arrayBufferToBase64(iv)
                         }),
                         success: res2 => {

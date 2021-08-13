@@ -28,7 +28,6 @@ body {
     .login-form {
         margin-top: 10%;
     }
-
     .register-form {
         margin-top: 10%;
     }
@@ -38,7 +37,6 @@ body {
     .main {
         margin-left: 40%;
     }
-
     .sidenav {
         width: 40%;
         position: fixed;
@@ -46,11 +44,9 @@ body {
         top: 0;
         left: 0;
     }
-
     .login-form {
         margin-top: 80%;
     }
-
     .register-form {
         margin-top: 20%;
     }
@@ -101,7 +97,13 @@ input[readonly] {
 }
 
 .low {
+    display: flex;
     margin-top: 10px;
+    flex-direction: column;
+}
+
+.hours-set {
+    margin-bottom: 5px;
 }
 
 .lower {

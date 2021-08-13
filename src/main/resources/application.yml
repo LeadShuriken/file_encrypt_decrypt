@@ -3,7 +3,8 @@ redis:
   port: 6379
   password:
   database: 0
-  ttl: PT3H
+  ttlMax: PT3H
+  ttlMin: PT1H
   pool:
     maxIdle: 6
     minIdle: 4

@@ -5,7 +5,6 @@ import javax.validation.Valid;
 import com.encrypto.config.RedisProps;
 import com.encrypto.model.FileStamp;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.qos.logback.core.util.Duration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -51,9 +49,10 @@ public class EncryptoController {
     @PostMapping("encrypt")
     public @ResponseBody Mono<Boolean> store(@Valid @RequestBody final FileStamp file) {
         return Mono.just(file)
-                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), enc.encode(i.getPassword()), i.getIv(),
-                        i.getExpiration(), new Date()))
-                .filter(a -> redisProps.getTtl().compareTo(a.getExpiration()) != -1)
+                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), enc.encode(i.getPassword()),
+                        i.getIv(), i.getExpiration(), new Date()))
+                .filter(a -> redisProps.getTtlMax().compareTo(a.getExpiration()) != -1
+                        && redisProps.getTtlMin().compareTo(a.getExpiration()) != 1)
                 .flatMap(a -> opps.opsForValue().set(a.getName(), a, a.getExpiration()));
     }
 }

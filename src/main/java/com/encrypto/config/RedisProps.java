@@ -17,6 +17,7 @@ public class RedisProps {
     private String password;
     private Integer database;
     private Integer port;
-    private Duration ttl;
+    private Duration ttlMax;
+    private Duration ttlMin;
     private RedisPool pool;
 }

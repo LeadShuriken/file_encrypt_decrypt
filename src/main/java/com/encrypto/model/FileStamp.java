@@ -48,7 +48,7 @@ public class FileStamp {
     @JsonProperty("expiration")
     @JsonSerialize(using = DurationSerializer.class)
     @JsonDeserialize(using = DurationDeserializer.class)
-    private Duration expiration = Duration.ofHours(1);
+    private Duration expiration;
 
     @Past
     @JsonProperty("atTime")
