@@ -34,10 +34,16 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
 
 * **WITH CLI COMMANDS**
 
-  Open the terminal and navigate to the root project folder.
+  To run open the terminal and navigate to the root project folder.
 
   ```sh
   $ ./mvnw spring-boot:run
+  ```
+
+  To package:
+
+  ```sh
+  $ ./mvnw package
   ```
 
 ### Todos
