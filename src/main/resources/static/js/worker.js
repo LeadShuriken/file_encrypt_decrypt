@@ -1,4 +1,3 @@
-
 function getWorkerJS() {
     const js = `
     onmessage = function (e) {

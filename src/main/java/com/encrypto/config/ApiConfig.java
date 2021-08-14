@@ -15,5 +15,4 @@ public class ApiConfig {
     private String version;
     private Integer maxReqPerSec;
     private String allowedOrigin;
-    private String originFilter;
 }
