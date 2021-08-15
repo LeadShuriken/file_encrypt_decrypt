@@ -3,6 +3,8 @@ package com.encrypto;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Component;
+
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
@@ -25,12 +27,15 @@ public class DataLoader {
 	}
 
 	@PostConstruct
-	public void loadData() {
-		factory.getReactiveConnection().serverCommands().flushAll()
-				.thenMany(Flux.just("A", "B", "C")
-						.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", name + "_iv",
-								Duration.ofHours(2), new Date()))
-						.flatMap(a -> opps.opsForValue().set(a.getId(), a, a.getExpiration())))
+	public void flushData() {
+		factory.getReactiveConnection().serverCommands().flushAll();
+	}
+
+	private void loadData() {
+		Flux.just("A", "B", "C")
+				.map(name -> new FileStamp(UUID.randomUUID().toString(), name, name + "_stamp", name + "_iv",
+						name + "_salt", Duration.ofHours(2), new Date()))
+				.flatMap(a -> opps.opsForValue().set(a.getId(), a, a.getExpiration()))
 				.thenMany(opps.keys("*").flatMap(opps.opsForValue()::get)).subscribe(System.out::println);
 	}
 }

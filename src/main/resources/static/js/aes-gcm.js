@@ -71,20 +71,19 @@ async function encryptMessage(key, data, iv) {
             iv
         },
         key,
-        convertStringToUintArray(data)
+        data
     );
 }
 
 async function decryptMessage(key, data, iv) {
-    return convertUintArraytoString(
-        await window.crypto.subtle.decrypt(
-            {
-                name: "AES-GCM",
-                iv: iv
-            },
-            key,
-            data
-        ));
+    return await window.crypto.subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        },
+        key,
+        data
+    );
 }
 
 function importKeyPBKDF2(password) {
@@ -111,22 +110,4 @@ function deriveKey(passwordKey, salt, usage) {
         },
         false,
         usage);
-}
-
-async function importKey(password, events) {
-    return await window.crypto.subtle.importKey(
-        "raw",
-        strToUint8Array(password),
-        "AES-GCM",
-        true,
-        events
-    );
-}
-
-function strToUint8Array(str) {
-    const bufView = new Uint8Array(32);
-    for (let i = 0, strLen = str.length; i < strLen; i++) {
-        bufView[i % 32] += str.charCodeAt(i);
-    }
-    return bufView;
 }

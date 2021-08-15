@@ -44,6 +44,10 @@ public class FileStamp {
     @Size(min = 1)
     private String iv;
 
+    @JsonProperty("salt")
+    @Size(min = 1)
+    private String salt;
+
     @NonNull
     @JsonProperty("expiration")
     @JsonSerialize(using = DurationSerializer.class)

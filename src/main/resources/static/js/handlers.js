@@ -52,43 +52,52 @@ $(document).ready(function () {
         let name = getFileName(file.name);
 
         const salt = window.crypto.getRandomValues(new Uint8Array(8));
+        const pepper = window.crypto.getRandomValues(new Uint8Array(8));
         const iv = window.crypto.getRandomValues(new Uint8Array(32));
-        const key = await deriveKey(await importKeyPBKDF2(password), salt, ["encrypt"]);
 
-        encryptMessage(key, name, iv)
-            .then(function (arrayBuffer) {
+        const importedPassKey = await importKeyPBKDF2(password);
+        const rawPasswordKey = await deriveKey(importedPassKey, salt, ["encrypt"]);
+        const oppsKey = await deriveKey(importedPassKey, pepper, ["encrypt"]);
 
-                const encryptedContentArr = new Uint8Array(arrayBuffer);
+        encryptMessage(rawPasswordKey, convertStringToUintArray(name), iv)
+            .then(function (ab) {
+
+                const encryptedContentArr = new Uint8Array(ab);
                 const buff = new Uint8Array(
                     salt.byteLength + encryptedContentArr.byteLength
                 );
                 buff.set(salt, 0);
                 buff.set(encryptedContentArr, salt.byteLength);
-                name = arrayBufferToBase64(buff);
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/v1/encrypt',
-                    contentType: "application/json",
-                    dataType: 'json',
-                    data: JSON.stringify({
-                        name,
-                        password,
-                        expiration: rangeTime.text() * 3600,
-                        iv: arrayBufferToBase64(iv)
-                    }),
-                    success: function (res2) {
-                        if (res2) {
-                            worker.onmessage = function (evt) {
-                                download(
-                                    evt.data,
-                                    name.replaceAll('/', '_'),
-                                    file.type)
-                            };
-                            worker.postMessage([file, iv, key, true]);
-                        }
-                    }
-                })
+                encryptMessage(oppsKey, buff, iv)
+                    .then(function (ab2) {
+                        name = arrayBufferToBase64(ab2);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/v1/encrypt',
+                            contentType: "application/json",
+                            dataType: 'json',
+                            data: JSON.stringify({
+                                name,
+                                password,
+                                expiration: rangeTime.text() * 3600,
+                                iv: arrayBufferToBase64(iv),
+                                salt: arrayBufferToBase64(pepper)
+                            }),
+                            success: function (res2) {
+                                if (res2) {
+                                    worker.onmessage = function (evt) {
+                                        download(
+                                            evt.data,
+                                            name.replaceAll('/', '_'),
+                                            file.type)
+                                    };
+                                    worker.postMessage([file, iv, rawPasswordKey, true]);
+                                }
+                            }
+                        })
+                    });
             });
     })
 
@@ -108,22 +117,29 @@ $(document).ready(function () {
             }),
             success: function (res) {
                 if (res) {
-                    importKeyPBKDF2(password).then(function (passwordKey) {
+                    const iv = base64ToArrayBuffer(res.iv);
+                    const pepper = base64ToArrayBuffer(res.salt);
 
-                        const encryptedDataBuff = base64ToArrayBuffer(res.name);
-                        const salt = encryptedDataBuff.slice(0, 8);
+                    importKeyPBKDF2(password).then(function (pk) {
 
-                        deriveKey(passwordKey, salt, ["decrypt"]).then(function (aesKey) {
+                        deriveKey(pk, pepper, ["decrypt"]).then(function (passwordKey) {
 
-                            const iv = base64ToArrayBuffer(res.iv);
-                            const encName = encryptedDataBuff.slice(8);
+                            const encryptedDataBuff = base64ToArrayBuffer(res.name);
 
-                            decryptMessage(aesKey, encName, iv).then(function (decr) {
-                                worker.onmessage = function (evt) {
-                                    download(evt.data, decr, file.type);
-                                };
-                                worker.postMessage([file, iv, aesKey, false]);
-                            })
+                            decryptMessage(passwordKey, encryptedDataBuff, iv).then(function (decrDataBuff) {
+
+                                const salt = decrDataBuff.slice(0, 8);
+                                deriveKey(pk, salt, ["decrypt"]).then(function (aesKey) {
+
+                                    const encName = decrDataBuff.slice(8);
+                                    decryptMessage(aesKey, encName, iv).then(function (decr) {
+                                        worker.onmessage = function (evt) {
+                                            download(evt.data, convertUintArraytoString(decr), file.type);
+                                        };
+                                        worker.postMessage([file, iv, aesKey, false]);
+                                    })
+                                });
+                            });
                         });
                     });
                 }
