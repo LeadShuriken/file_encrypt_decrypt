@@ -20,29 +20,47 @@
             <br>
             <ul>
                 <li>User submits a file with a password for encryption.</li>
-                <li>Password is used to derive a CryptoKey(PBKDF2) and a IV Vector is generated.
+                <li>Random Salts and a IV Vector are generated.</li>
+                <li>Password is used to import a CryptoKey(PBKDF2).</li>
+                <li>Password CryptoKey is used with respective Salt for deriving 2 encryption keys(PBKDF2)</li>
+                <li>First CryptoKey is used to encrypt the name of the file without the extension.
                 </li>
-                <li>Raw Vector and CryptoKey are used to encrypt the filename (App), file (WebWorker).
+                <li>The Salt for that key is added to the resulting encrypted name (ArrayBuffer).
                 </li>
-                <li>IV Vector in Base64, the encrypted name and password are sent to Service.
+                <li>The Salted and encrypted buffer data is encrypted again with the second key.
                 </li>
-                <li>IV Vector in Base64, the encrypted name and password are sent to Service.
+                <li>Name is send to the service with the IV Vector(Base64),second Salt(Base64), password.
                 </li>
-                <li>Service hashes the password and stores the data adding the decrypt time.
+                <li>Service hashes the password and stores the data adding the decryption time(Redis TTL).
                 </li>
-                <li>File with a now encrypted name is downloaded to the client.
+                <li>First CryptoKey, IV Vector, File Blob(Bin Large Object) is passed to the WebWorker.
+                </li>
+                <li>WebWorker reads the Blob as a buffer and encrypts the data(AES-GCM).
+                </li>
+                <li>WebWorker returns data to app where it downloads it with the Base64 name to the client.
                 </li>
             </ul>
             <br>
-            <h5>Decrypt Workflow:</h5>
+            <h5>Decrypt(Happy) Workflow:</h5>
             <br>
             <ul>
                 <li>User submits a file and a password for dencryption.</li>
-                <li>App passes password, file name(now hashed) to the service.</li>
+                <li>App passes the password, file name(Base64) to the service.</li>
                 <li>Service queries for the name and verifies the password hash.</li>
-                <li>Service removes the item and returns the IV Vector to the application.</li>
-                <li>WebCrypto uses the password and converted vector to decrypt the file.</li>
-                <li>File with a now decrypted name is downloaded to the client.
+                <li>Service removes the item and returns the IV Vector and second Salt(Enc Work.).
+                </li>
+                <li>Salt and IV Vector are converted to ArrayBuffers.
+                </li>
+                <li>A CryptoKey(PBKDF2) is imported(created) from the raw(client side) password.
+                </li>
+                <li>Resulting key is user derive another key with the Salt.
+                </li>
+                <li>This second key is used to decrypt the file from which the prepended Salt is extracted.
+                </li>
+                <li>This second Salt is used with the password key to derive the final key.
+                </li>
+                <li>It is used to decrypt both the file(WebWorker) and the filename (buffer result with no salt).</li>
+                <li>File with a now decrypted name is downloaded to the client by the App.
                 </li>
             </ul>
         </div>

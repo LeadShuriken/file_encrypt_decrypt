@@ -11,7 +11,7 @@ body {
     height: 100%;
     background-color: #000;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .main {
@@ -53,8 +53,7 @@ body {
 }
 
 .login-main-text {
-    margin-top: 5%;
-    padding: 60px;
+    padding: 40px;
     color: #fff;
 }
 
