@@ -55,7 +55,7 @@ FILE-ENCRYPT-DECRYPT uses a number of open source projects:
   * [WEBWORKERS] - API FOR BACKGROUND THREAD HANDLING
   * [WEBFLUX] - REACTIVE STREAMS API FOR NON BLOCKING SERVERS
   * [REDIS] - IN-MEMORY DATA STRUCTURE STORE/CACHE
-  * [LETUCE] - SCALABLE REACTIVE-REDIS CLIENT
+  * [LETTUCE] - SCALABLE REACTIVE-REDIS CLIENT
   
 ## Installation
 
@@ -99,7 +99,7 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   [WEBWORKERS]:<https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API>
   [WEBFLUX]:<https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html>
   [REDIS]:<https://redis.io/>
-  [LETUCE]:<https://lettuce.io/>
+  [LETTUCE]:<https://lettuce.io/>
   [MAVEN]:<https://maven.apache.org/>
   [PBKDF2]: <https://en.wikipedia.org/wiki/PBKDF2>
 
