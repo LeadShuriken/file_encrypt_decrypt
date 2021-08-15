@@ -13,12 +13,11 @@ Redis is used to allow for flat expiration times of tokens as well as because of
 </br>
 
 ## Workflow
-</br>
 
 ### Encrypto Workflow:
 
 * User submits a file with a password for encryption.
-* Random Salts and a IV Vector are generated.
+* Random Salts and a [IV Vector] are generated.
 * Password is used to import a CryptoKey([PBKDF2]).
 * Password CryptoKey is used with respective Salt for deriving 2 encryption keys(PBKDF2)
 * First CryptoKey is used to encrypt the name of the file without the extension.
@@ -43,8 +42,6 @@ Redis is used to allow for flat expiration times of tokens as well as because of
 * This second Salt is used with the password key to derive the final key.
 * It is used to decrypt both the file(WebWorker) and the filename (buffer result with no salt).
 * File with a now decrypted name is downloaded to the client by the App.
-
-</br>
 
 ## Technologies
 
@@ -112,3 +109,4 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   [CryptoKey]:<https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey>
   [Salt]:<https://en.wikipedia.org/wiki/Salt_(cryptography)>
   [AES-GCM]:<https://en.wikipedia.org/wiki/Galois/Counter_Mode>
+  [IV Vector]:<https://en.wikipedia.org/wiki/Initialization_vector>
