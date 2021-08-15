@@ -34,7 +34,7 @@ public class EncryptoController {
         this.enc = enc;
     }
 
-    @GetMapping("get")
+    // @GetMapping("get")
     public @ResponseBody Flux<FileStamp> all() {
         return opps.keys("*").flatMap(opps.opsForValue()::get);
     }

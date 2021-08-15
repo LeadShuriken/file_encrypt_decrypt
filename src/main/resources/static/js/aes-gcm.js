@@ -1,17 +1,12 @@
-function flush() {
-    const textArea = document.getElementById('textArea');
-    textArea.disabled = true;
-    document.getElementById('fileinput').value = null;
-    document.getElementById('filename').value = null;
-    document.getElementById('encrypt').disabled = true;
-    document.getElementById('decrypt').disabled = true;
+function getFileName(str) {
+    return str.split('.').slice(0, -1).join('.');
 }
 
 function download(data, filename, type) {
     var file = new Blob([data], { type: type });
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
+    if (window.navigator.msSaveOrOpenBlob)
         window.navigator.msSaveOrOpenBlob(file, filename);
-    else { // Others
+    else {
         var a = document.createElement("a"),
             url = URL.createObjectURL(file);
         a.href = url;
@@ -21,19 +16,32 @@ function download(data, filename, type) {
         setTimeout(function () {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
-            flush();
+            const textArea = document.getElementById('textArea');
+            textArea.disabled = true;
+            document.getElementById('fileinput').value = null;
+            document.getElementById('filename').value = null;
+            document.getElementById('encrypt').disabled = true;
+            document.getElementById('decrypt').disabled = true;
         }, 0);
     }
 }
 
-function convertStringToArrayBuffer(str) {
+function convertStringToUintArray(str) {
     var encoder = new TextEncoder("utf-8");
-    return encoder.encode(str);
+    return encoder.encode(encodeURIComponent(str));
 }
 
-function convertArrayBuffertoString(buffer) {
+function convertUintArraytoString(buffer) {
     var decoder = new TextDecoder("utf-8");
-    return decoder.decode(buffer);
+    return decodeURIComponent(decoder.decode(buffer));
+}
+
+function utf8_to_b64(str) {
+    return window.btoa(unescape(encodeURIComponent(str)));
+}
+
+function b64_to_utf8(str) {
+    return decodeURIComponent(escape(window.atob(str)));
 }
 
 function arrayBufferToBase64(buffer) {
@@ -43,11 +51,11 @@ function arrayBufferToBase64(buffer) {
     for (var i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa(binary);
+    return utf8_to_b64(binary);
 }
 
 function base64ToArrayBuffer(base64) {
-    var binary_string = window.atob(base64);
+    var binary_string = b64_to_utf8(base64);
     var len = binary_string.length;
     var bytes = new Uint8Array(len);
     for (var i = 0; i < len; i++) {
@@ -63,19 +71,46 @@ async function encryptMessage(key, data, iv) {
             iv
         },
         key,
-        convertStringToArrayBuffer(data)
+        convertStringToUintArray(data)
     );
 }
 
 async function decryptMessage(key, data, iv) {
-    return convertArrayBuffertoString(await window.crypto.subtle.decrypt(
+    return convertUintArraytoString(
+        await window.crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            key,
+            data
+        ));
+}
+
+function importKeyPBKDF2(password) {
+    return window.crypto.subtle.importKey(
+        "raw",
+        convertStringToUintArray(password),
+        "PBKDF2",
+        false,
+        ["deriveKey"]);
+}
+
+function deriveKey(passwordKey, salt, usage) {
+    return window.crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 250000,
+            hash: "SHA-256",
+        },
+        passwordKey,
         {
             name: "AES-GCM",
-            iv: iv
+            length: 256
         },
-        key,
-        base64ToArrayBuffer(data)
-    ));
+        false,
+        usage);
 }
 
 async function importKey(password, events) {
@@ -90,8 +125,8 @@ async function importKey(password, events) {
 
 function strToUint8Array(str) {
     const bufView = new Uint8Array(32);
-    for (let i = 0, strLen = str.length; i < strLen && i < 32; i++) {
-        bufView[i] = str.charCodeAt(i);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i % 32] += str.charCodeAt(i);
     }
     return bufView;
 }

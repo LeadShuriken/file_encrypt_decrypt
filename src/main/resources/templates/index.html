@@ -20,9 +20,11 @@
             <br>
             <ul>
                 <li>User submits a file with a password for encryption.</li>
-                <li>Password is used to create a CryptoKey and generate a IV Vector.
+                <li>Password is used to derive a CryptoKey(PBKDF2) and a IV Vector is generated.
                 </li>
-                <li>Raw Vector and password are used to encrypt the filename (App), file (WebWorker).
+                <li>Raw Vector and CryptoKey are used to encrypt the filename (App), file (WebWorker).
+                </li>
+                <li>IV Vector in Base64, the encrypted name and password are sent to Service.
                 </li>
                 <li>IV Vector in Base64, the encrypted name and password are sent to Service.
                 </li>
@@ -63,8 +65,8 @@
                     </div>
 
                     <div class="form-group low">
-                        <label for="textArea">Input password...</label>
-                        <textarea class="form-control" maxlength="32" id="textArea" rows="2" disabled></textarea>
+                        <label for="textArea">Input password (10 char min)...</label>
+                        <textarea class="form-control" id="textArea" rows="2" disabled></textarea>
                     </div>
 
                     <div th:with="maxDuration=${@redisProps.ttlMax.toHours()}" class="form-group low">

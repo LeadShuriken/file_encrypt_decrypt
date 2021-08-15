@@ -15,7 +15,8 @@ $(document).ready(function () {
 
     $('textarea').bind('input propertychange',
         function () {
-            if ($(this).val()) {
+            const val = $(this).val();
+            if (val && val.length > 9) {
                 buttons.removeAttr('disabled');
                 formControlRange.removeAttr('disabled');
             }
@@ -26,14 +27,18 @@ $(document).ready(function () {
         });
 
     $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
-        var input = $(this).parents('.input-group').find(':text'),
-            log = numFiles > 1 ? numFiles + ' files selected' : label;
-
+        const input = $(this).parents('.input-group').find(':text');
         if (input.length) {
-            input.val(log);
+            input.val(label);
             textArea.attr('disabled', false);
+            if (textArea.val()) {
+                if (!worker)
+                    worker = new Worker(getWorkerJS());
+                buttons.removeAttr('disabled');
+                formControlRange.removeAttr('disabled');
+            }
         } else {
-            if (log) alert(log);
+            if (label) alert(label);
         }
     });
 
@@ -41,47 +46,56 @@ $(document).ready(function () {
         rangeTime.text(event.target.value);
     });
 
-    $("#encrypt").button().click(function () {
-        const password = document.getElementById('textArea').value;
-        const iv = window.crypto.getRandomValues(new Uint8Array(32));
+    $("#encrypt").button().click(async function () {
+        const password = textArea.val();
         const file = document.getElementById('fileinput').files[0];
-        const name = file.name.split('.').slice(0, -1).join('.').replaceAll(' ', '_');
-        const type = file.type;
-        importKey(password, ["encrypt", "decrypt"]).then(key => {
-            encryptMessage(key, name, iv)
-                .then(arrayBuffer => {
-                    base64Name = arrayBufferToBase64(arrayBuffer);
-                    $.ajax({
-                        type: 'POST',
-                        url: '/v1/encrypt',
-                        contentType: "application/json",
-                        dataType: 'json',
-                        data: JSON.stringify({
-                            name: base64Name,
-                            password: password,
-                            expiration: rangeTime.text() * 3600,
-                            iv: arrayBufferToBase64(iv)
-                        }),
-                        success: res2 => {
-                            if (res2) {
-                                worker.onmessage = (evt) => {
-                                    download(evt.data, base64Name, type)
-                                };
-                                importKey(password, ["encrypt", "decrypt"]).then(key => {
-                                    worker.postMessage([file, iv, key, true]);
-                                })
-                            }
+        let name = getFileName(file.name);
+
+        const salt = window.crypto.getRandomValues(new Uint8Array(8));
+        const iv = window.crypto.getRandomValues(new Uint8Array(32));
+        const key = await deriveKey(await importKeyPBKDF2(password), salt, ["encrypt"]);
+
+        encryptMessage(key, name, iv)
+            .then(function (arrayBuffer) {
+
+                const encryptedContentArr = new Uint8Array(arrayBuffer);
+                const buff = new Uint8Array(
+                    salt.byteLength + encryptedContentArr.byteLength
+                );
+                buff.set(salt, 0);
+                buff.set(encryptedContentArr, salt.byteLength);
+                name = arrayBufferToBase64(buff);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/v1/encrypt',
+                    contentType: "application/json",
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        name,
+                        password,
+                        expiration: rangeTime.text() * 3600,
+                        iv: arrayBufferToBase64(iv)
+                    }),
+                    success: function (res2) {
+                        if (res2) {
+                            worker.onmessage = function (evt) {
+                                download(
+                                    evt.data,
+                                    name.replaceAll('/', '_'),
+                                    file.type)
+                            };
+                            worker.postMessage([file, iv, key, true]);
                         }
-                    })
-                });
-        });
+                    }
+                })
+            });
     })
 
     $("#decrypt").button().click(function () {
-        const password = document.getElementById('textArea').value;
+        const password = textArea.val();
         const file = document.getElementById('fileinput').files[0];
-        const name = file.name.split('.').slice(0, -1).join('.').replaceAll('_', '/');
-        const type = file.type;
+        const name = getFileName(file.name).replaceAll('_', '/');
 
         $.ajax({
             type: 'POST',
@@ -92,17 +106,26 @@ $(document).ready(function () {
                 password,
                 name
             }),
-            success: res => {
+            success: function (res) {
                 if (res) {
-                    importKey(password, ["encrypt", "decrypt"]).then(key => {
-                        const iv = base64ToArrayBuffer(res.iv);
-                        decryptMessage(key, name, iv).then(decr => {
-                            worker.onmessage = (evt) => {
-                                download(evt.data, decr, type);
-                            };
-                            worker.postMessage([file, iv, key, false]);
-                        })
-                    })
+                    importKeyPBKDF2(password).then(function (passwordKey) {
+
+                        const encryptedDataBuff = base64ToArrayBuffer(res.name);
+                        const salt = encryptedDataBuff.slice(0, 8);
+
+                        deriveKey(passwordKey, salt, ["decrypt"]).then(function (aesKey) {
+
+                            const iv = base64ToArrayBuffer(res.iv);
+                            const encName = encryptedDataBuff.slice(8);
+
+                            decryptMessage(aesKey, encName, iv).then(function (decr) {
+                                worker.onmessage = function (evt) {
+                                    download(evt.data, decr, file.type);
+                                };
+                                worker.postMessage([file, iv, aesKey, false]);
+                            })
+                        });
+                    });
                 }
             }
         })

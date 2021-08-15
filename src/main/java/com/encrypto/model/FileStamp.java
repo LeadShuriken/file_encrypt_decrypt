@@ -32,16 +32,16 @@ public class FileStamp {
     private String id;
 
     @JsonProperty("name")
-    @Size(max = 100, min = 1)
+    @Size(min = 1)
     private String name;
 
     @NonNull
     @JsonProperty("password")
-    @Size(max = 100, min = 1)
+    @Size(min = 1)
     private String password;
 
     @JsonProperty("iv")
-    @Size(max = 100, min = 1)
+    @Size(min = 1)
     private String iv;
 
     @NonNull
