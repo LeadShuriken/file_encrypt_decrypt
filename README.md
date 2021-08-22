@@ -8,7 +8,7 @@ This app encrypts and decrypts files using the now widely supported [WebCrypto] 
   * It also stores the operation password hash which is used to facilitate the process by being converted to a [CryptoKey] (aka a 'given key') after it has been identified as the password of the encryptor.
   * As well as the encrypted file name and [Salt].
 
-Redis is used to allow for flat expiration times of tokens as well as because of developer convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt.
+Redis is used to allow for flat expiration times of tokens/entries as well as because of dev. convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt of the file data.
 </br>
 </br>
 
