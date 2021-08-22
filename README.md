@@ -10,7 +10,6 @@ This app encrypts and decrypts files using the now widely supported [WebCrypto] 
 
 Redis is used to allow for flat expiration times of tokens/entries as well as because of dev. convenience. WebWorker are used to perform the computationally expensive operations such as File Read and the actual Subtle.encrypt/decrypt of the file data.
 </br>
-</br>
 
 ## Workflow
 

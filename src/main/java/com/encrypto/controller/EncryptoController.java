@@ -49,10 +49,10 @@ public class EncryptoController {
     @PostMapping("encrypt")
     public @ResponseBody Mono<Boolean> store(@Valid @RequestBody final FileStamp file) {
         return Mono.just(file)
-                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), enc.encode(i.getPassword()),
-                        i.getIv(), i.getSalt(), i.getExpiration(), new Date()))
                 .filter(a -> redisProps.getTtlMax().compareTo(a.getExpiration()) != -1
                         && redisProps.getTtlMin().compareTo(a.getExpiration()) != 1)
+                .map(i -> new FileStamp(UUID.randomUUID().toString(), i.getName(), enc.encode(i.getPassword()),
+                        i.getIv(), i.getSalt(), i.getExpiration(), new Date()))
                 .flatMap(a -> opps.opsForValue().set(a.getName(), a, a.getExpiration()));
     }
 }
