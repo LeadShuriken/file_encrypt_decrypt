@@ -1,5 +1,5 @@
 redis:
-  isEmbeded: true
+  isEmbeded: false
   maxMemoryMB: 128
   hostName: 127.0.0.1
   port: 6379
@@ -16,6 +16,7 @@ redis:
 api:
   version: v1
   maxReqPerSec: 5
+  filterOrigin: false
   allowedOrigin: 'http://localhost:8080'
 
 webjars:

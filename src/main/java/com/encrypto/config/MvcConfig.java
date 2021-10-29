@@ -3,6 +3,7 @@ package com.encrypto.config;
 import com.encrypto.filters.ApiOriginFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "api", name = "filterOrigin", havingValue = "true")
     public FilterRegistrationBean<ApiOriginFilter> logFilter() {
         FilterRegistrationBean<ApiOriginFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new ApiOriginFilter(config));
