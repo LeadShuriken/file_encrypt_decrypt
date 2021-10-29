@@ -4,7 +4,6 @@ import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Component;
 
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
@@ -15,7 +14,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
-@Component
+// @Component
 public class DataLoader {
 
 	private final ReactiveRedisConnectionFactory factory;
@@ -29,6 +28,7 @@ public class DataLoader {
 	@PostConstruct
 	public void flushData() {
 		factory.getReactiveConnection().serverCommands().flushAll();
+		loadData();
 	}
 
 	private void loadData() {

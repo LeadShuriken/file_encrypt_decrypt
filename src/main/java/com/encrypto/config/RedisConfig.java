@@ -17,7 +17,12 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import redis.embedded.RedisServer;
 import java.time.Duration;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import com.encrypto.model.FileStamp;
 
@@ -26,6 +31,24 @@ public class RedisConfig {
 
     @Autowired
     private RedisProps redisProps;
+
+    private RedisServer redisServer;
+
+    @PostConstruct
+    private void startEmbeded() {
+        if (redisProps.getIsEmbeded()) {
+            this.redisServer = RedisServer.builder().port(redisProps.getPort())
+                    .setting("maxmemory " + redisProps.getMaxMemoryMB() + "M").build();
+            this.redisServer.start();
+        }
+    }
+
+    @PreDestroy
+    private void stopEmbeded() {
+        if (redisProps.getIsEmbeded()) {
+            this.redisServer.stop();
+        }
+    }
 
     private RedisStandaloneConfiguration redisConfig() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();

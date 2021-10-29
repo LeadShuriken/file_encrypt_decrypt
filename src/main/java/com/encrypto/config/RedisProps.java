@@ -13,6 +13,8 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "redis")
 public class RedisProps {
 
+    private Integer maxMemoryMB;
+    private Boolean isEmbeded;
     private String hostName;
     private String password;
     private Integer database;

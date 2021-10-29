@@ -82,6 +82,18 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   $ ./mvnw package
   ```
 
+* **WITH DOCKER**
+
+  To build:
+  ```sh
+  $ docker build -f Dockerfile -t encrypto .
+  ```
+
+  To run:
+  ```sh
+  $ docker run --rm -it -p 8080:8080 encrypto:latest
+  ```
+
 ### Todos
 
  - FE Expiration duration

@@ -6,7 +6,7 @@ $(document).on('change', '.btn-file :file', function () {
 });
 
 $(document).ready(function () {
-    const worker = new Worker(getWorkerJS());
+    let worker = new Worker(getWorkerJS());
 
     const buttons = $('button');
     const textArea = $('textarea');
