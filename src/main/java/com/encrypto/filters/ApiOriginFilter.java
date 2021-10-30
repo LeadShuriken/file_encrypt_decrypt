@@ -6,7 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.encrypto.config.ApiConfig;
+import com.encrypto.models.ApiConfig;
 import com.google.common.base.Strings;
 
 import org.springframework.core.Ordered;

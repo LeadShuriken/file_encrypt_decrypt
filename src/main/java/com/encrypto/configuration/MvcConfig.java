@@ -1,6 +1,7 @@
-package com.encrypto.config;
+package com.encrypto.configuration;
 
 import com.encrypto.filters.ApiOriginFilter;
+import com.encrypto.models.ApiConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

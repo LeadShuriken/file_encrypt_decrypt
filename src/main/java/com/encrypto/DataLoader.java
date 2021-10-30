@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
 
-import com.encrypto.model.FileStamp;
+import com.encrypto.models.FileStamp;
 
 import java.time.Duration;
 import java.util.Date;

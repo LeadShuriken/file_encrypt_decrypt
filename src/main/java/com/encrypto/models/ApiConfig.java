@@ -1,4 +1,4 @@
-package com.encrypto.config;
+package com.encrypto.models;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

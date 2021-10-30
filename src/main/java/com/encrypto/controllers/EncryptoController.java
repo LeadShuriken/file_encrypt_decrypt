@@ -1,9 +1,9 @@
-package com.encrypto.controller;
+package com.encrypto.controllers;
 
 import javax.validation.Valid;
 
-import com.encrypto.config.RedisProps;
-import com.encrypto.model.FileStamp;
+import com.encrypto.models.FileStamp;
+import com.encrypto.models.RedisProps;
 
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;

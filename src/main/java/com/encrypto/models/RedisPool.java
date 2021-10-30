@@ -1,4 +1,4 @@
-package com.encrypto.config;
+package com.encrypto.models;
 
 import lombok.Getter;
 import lombok.Setter;

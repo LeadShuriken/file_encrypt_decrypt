@@ -1,4 +1,4 @@
-package com.encrypto.model;
+package com.encrypto.models;
 
 import java.time.Duration;
 import java.util.Date;

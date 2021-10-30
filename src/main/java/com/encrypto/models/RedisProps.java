@@ -1,4 +1,4 @@
-package com.encrypto.config;
+package com.encrypto.models;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,6 @@ import java.time.Duration;
 public class RedisProps {
 
     private Integer maxMemoryMB;
-    private Boolean isEmbeded;
     private String hostName;
     private String password;
     private Integer database;
