@@ -6,17 +6,17 @@ function prop {
 
 # GLOBAL SPEC
 B_NAME=encrypto_server
-ACCOUNT_ID=$(prop 'prop.account.id')
-DEPLOY_REGION=$(prop 'prop.account.region')
+ACCOUNT_ID=$(prop 'account.id')
+DEPLOY_REGION=$(prop 'account.region')
 
 # BUILD SPEC
-AMI_OS_TYPE=$(prop 'prop.'$B_NAME'.image.ami')
-AMI_HARDWARE_TYPE=$(prop 'prop.'$B_NAME'.image.type')
-EC2_ROLE=$(prop 'prop.'$B_NAME'.ec2.role')
-EC2_KEY=$(prop 'prop.'$B_NAME'.ec2.key_pair')
-SECURITY_GROUP=$(prop 'prop.'$B_NAME'.vpc.security_group.id')
-VPC_SUBNET=$(prop 'prop.'$B_NAME'.vpc.subnet.id')
-ECR_REPO=$(prop 'prop.'$B_NAME'.ecr.repo')
+AMI_OS_TYPE=$(prop ''$B_NAME'.image.ami')
+AMI_HARDWARE_TYPE=$(prop ''$B_NAME'.image.type')
+EC2_ROLE=$(prop ''$B_NAME'.ec2.role')
+EC2_KEY=$(prop ''$B_NAME'.ec2.key_pair')
+SECURITY_GROUP=$(prop ''$B_NAME'.vpc.security_group.id')
+VPC_SUBNET=$(prop ''$B_NAME'.vpc.subnet.id')
+ECR_REPO=$(prop ''$B_NAME'.ecr.repo')
 
 # Authenticate with ecr registry
 aws ecr get-login-password --region $DEPLOY_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com
@@ -44,6 +44,7 @@ INSTANCE_ID=$(aws ec2 run-instances \
         --user-data file://temp.sh \
         --query "Instances[*].InstanceId")
 
+unlink temp.sh
 echo ID: $INSTANCE_ID
 
 # INSTANCE TEMPLATE IS UPDATED LOGIN OR RUN

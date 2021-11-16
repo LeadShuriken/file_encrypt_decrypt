@@ -13,7 +13,6 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-
 const RFOLDER = './src/main/resources/';
 const APPLICATION = yaml.load(
     fs.readFileSync(`${RFOLDER}application.yml`, 'utf8')
