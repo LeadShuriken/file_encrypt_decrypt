@@ -1,0 +1,67 @@
+#!/bin/bash
+ENV=${1:-dev}
+function prop {
+    grep "${1}" env/${ENV}.properties|cut -d'=' -f2
+}
+
+# GLOBAL SPEC
+B_NAME=encrypto_server
+ACCOUNT_ID=$(prop 'prop.account.id')
+DEPLOY_REGION=$(prop 'prop.account.region')
+
+# BUILD SPEC
+AMI_OS_TYPE=$(prop 'prop.'$B_NAME'.image.ami')
+AMI_HARDWARE_TYPE=$(prop 'prop.'$B_NAME'.image.type')
+EC2_ROLE=$(prop 'prop.'$B_NAME'.ec2.role')
+EC2_KEY=$(prop 'prop.'$B_NAME'.ec2.key_pair')
+SECURITY_GROUP=$(prop 'prop.'$B_NAME'.vpc.security_group.id')
+VPC_SUBNET=$(prop 'prop.'$B_NAME'.vpc.subnet.id')
+ECR_REPO=$(prop 'prop.'$B_NAME'.ecr.repo')
+
+# Authenticate with ecr registry
+aws ecr get-login-password --region $DEPLOY_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com
+
+# Build Docker
+docker build -f Dockerfile -t $B_NAME .
+
+# TAG
+docker tag $B_NAME:latest $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com/$ECR_REPO:latest
+docker push $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com/$ECR_REPO:latest
+
+cat dockerboot.sh > tempbuild.sh
+echo "aws ecr get-login-password --region $DEPLOY_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com" >> tempbuild.sh
+echo "docker pull $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com/$ECR_REPO:latest" >> tempbuild.sh
+
+INSTANCE_ID=$(aws ec2 run-instances \
+        --image-id $AMI_OS_TYPE \
+        --count 1 \
+        --instance-type $AMI_HARDWARE_TYPE \
+        --key-name $EC2_KEY \
+        --security-group-ids $SECURITY_GROUP \
+        --subnet-id $VPC_SUBNET \
+        --iam-instance-profile Name=$EC2_ROLE \
+        --output text \
+        --user-data file://temp.sh \
+        --query "Instances[*].InstanceId")
+
+echo ID: $INSTANCE_ID
+
+# INSTANCE TEMPLATE IS UPDATED LOGIN OR RUN
+
+aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
+aws ec2 wait system-status-ok --instance-ids $INSTANCE_ID
+
+# PUBLIC_IP=$(aws ec2 describe-instances \
+#     --instance-ids $INSTANCE_ID \
+#     --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#     --output text)
+# ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i $EC2_KEY.pem 
+
+aws ssm send-command \
+    --document-name "AWS-RunShellScript" \
+    --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
+    --output text \
+    --parameters 'commands=[
+        "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest"
+    ]'

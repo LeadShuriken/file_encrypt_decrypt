@@ -33,4 +33,7 @@ build/
 .vscode/
 
 ### AWS ###
+env
 encrypto-pair.pem
+temp.sh
+utils.sh

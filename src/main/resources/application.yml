@@ -1,5 +1,5 @@
 redis:
-  isEmbeded: true
+  isEmbeded: false
   maxMemoryMB: 128
   hostName: 127.0.0.1
   port: 6379
