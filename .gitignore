@@ -37,3 +37,6 @@ env
 encrypto-pair.pem
 temp.sh
 utils.sh
+
+### WEB PACK ###
+node_modules

@@ -18,13 +18,14 @@ public class MvcConfig implements WebMvcConfigurer {
     private ApiConfig config;
 
     @Override
+    @ConditionalOnProperty(prefix = "api", name = "isEmbeded", havingValue = "true")
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/index").setViewName("index");
         registry.addViewController("/").setViewName("index");
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "api", name = "filterOrigin", havingValue = "true")
+    @ConditionalOnProperty(prefix = "api", name = "deploy", havingValue = "false")
     public FilterRegistrationBean<ApiOriginFilter> logFilter() {
         FilterRegistrationBean<ApiOriginFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new ApiOriginFilter(config));

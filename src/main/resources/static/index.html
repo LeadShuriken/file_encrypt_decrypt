@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Encrypto</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@BOOTSTRAP_VERSION/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <div class=" sidenav">
+        <div class="login-main-text">
+            <h2>Encrypto</h2>
+            <br>
+            <h4>File Encrypt/Decript Service</h4>
+            <br>
+            <h5>Encrypto Workflow:</h5>
+            <br>
+            <ul>
+                <li>User submits a file with a password for encryption.</li>
+                <li>Random Salts and a IV Vector are generated.</li>
+                <li>Password is used to import a CryptoKey(PBKDF2).</li>
+                <li>Password CryptoKey is used with respective Salt for deriving 2 encryption keys(PBKDF2)</li>
+                <li>First CryptoKey is used to encrypt the name of the file without the extension.
+                </li>
+                <li>The Salt for that key is added to the resulting encrypted name (ArrayBuffer).
+                </li>
+                <li>The Salted and encrypted buffer data is encrypted again with the second key.
+                </li>
+                <li>Name is send to the service with the IV Vector(Base64),second Salt(Base64), password.
+                </li>
+                <li>Service hashes the password and stores the data adding the decryption time(Redis TTL).
+                </li>
+                <li>First CryptoKey, IV Vector, File Blob(Bin Large Object) is passed to the WebWorker.
+                </li>
+                <li>WebWorker reads the Blob as a buffer and encrypts the data(AES-GCM).
+                </li>
+                <li>WebWorker returns data to app where it downloads it with the Base64 name to the client.
+                </li>
+            </ul>
+            <br>
+            <h5>Decrypt(Happy) Workflow:</h5>
+            <br>
+            <ul>
+                <li>User submits a file and a password for dencryption.</li>
+                <li>App passes the password, file name(Base64) to the service.</li>
+                <li>Service queries for the name and verifies the password hash.</li>
+                <li>Service removes the item and returns the IV Vector and second Salt(Enc Work.).
+                </li>
+                <li>Salt and IV Vector are converted to ArrayBuffers.
+                </li>
+                <li>A CryptoKey(PBKDF2) is imported(created) from the raw(client side) password.
+                </li>
+                <li>Resulting key is user derive another key with the Salt.
+                </li>
+                <li>This second key is used to decrypt the file from which the prepended Salt is extracted.
+                </li>
+                <li>This second Salt is used with the password key to derive the final key.
+                </li>
+                <li>It is used to decrypt both the file(WebWorker) and the filename (buffer result with no salt).</li>
+                <li>File with a now decrypted name is downloaded to the client by the App.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="main">
+        <div class="col-md-7 col-sm-12">
+            <div class="login-form">
+                <form class="needs-validation" novalidate>
+
+                    <div class="form-group">
+                        <label for="fileArea">Select file to encrypt/decript...</label>
+                        <div id="fileArea" class="input-group">
+                            <span class="input-group-btn">
+                                <span class="btn btn-secondary btn-file">
+                                    Browse&hellip; <input id='fileinput' type="file" single>
+                                </span>
+                            </span>
+                            <input type="text" id='filename' class="form-control silence" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group low">
+                        <label for="textArea">Input password (10 char min)...</label>
+                        <textarea class="form-control" id="textArea" rows="2" disabled></textarea>
+                    </div>
+
+                    <div class="form-group low">
+                        <div class='hours-set'>
+                            <label for="formControlRange">Hours to decrypt:&nbsp;</label><span id='rangeTime'
+                                text=REDIS_TTL_MAX></span>
+                        </div>
+                        <input disabled type="range" step="0.5" max=REDIS_TTL_MAX value=REDIS_TTL_MAX min=REDIS_TTL_MIN
+                            class="form-control-range" id="formControlRange">
+                    </div>
+
+                    <div class="lower">
+                        <button type="button" id='encrypt' class="btn btn-danger" disabled>Encrypt</button>
+                        <button type="button" id='decrypt' class="btn btn-success" disabled>Decrypt</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-JQUERY_VERSION.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@BOOTSTRAP_VERSION/dist/js/bootstrap.min.js"></script>
+    <script defer="defer" src="worker.js"></script>
+</body>
+
+</html>

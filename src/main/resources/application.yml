@@ -14,9 +14,11 @@ redis:
     maxWaitMillis: 100
 
 api:
+  r53: 3.235.20.42
   version: v1
   maxReqPerSec: 5
   filterOrigin: false
+  deploy: false
   allowedOrigin: 'http://localhost:8080'
 
 webjars:

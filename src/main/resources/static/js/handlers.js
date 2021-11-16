@@ -75,7 +75,7 @@ $(document).ready(function () {
 
                         $.ajax({
                             type: 'POST',
-                            url: '/v1/encrypt',
+                            url: PRODUCTION ? R53 + '/v1/encrypt' : '/v1/encrypt',
                             contentType: "application/json",
                             dataType: 'json',
                             data: JSON.stringify({
@@ -108,7 +108,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: '/v1/decrypt',
+            url: PRODUCTION ? R53 + '/v1/decrypt' : '/v1/decrypt',
             contentType: "application/json",
             dataType: 'json',
             data: JSON.stringify({
