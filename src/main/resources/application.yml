@@ -14,12 +14,11 @@ redis:
     maxWaitMillis: 100
 
 api:
-  r53: 3.235.20.42
+  r53: 127.0.0.1:8080
   version: v1
   maxReqPerSec: 5
-  filterOrigin: false
-  deploy: false
-  allowedOrigin: 'http://localhost:8080'
+  filterOrigin: true
+  allowedOrigin: 'http://localhost:9000'
 
 webjars:
   bootstrap: "5.1.0"

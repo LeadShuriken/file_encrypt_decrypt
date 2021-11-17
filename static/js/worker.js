@@ -1,4 +1,4 @@
-function getWorkerJS() {
+export function getWorkerJS() {
     const js = `
     onmessage = function (e) {
         var reader = new FileReaderSync();

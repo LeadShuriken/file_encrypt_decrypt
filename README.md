@@ -82,7 +82,7 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   $ ./mvnw package
   ```
 
-* **WITH DOCKER**
+* **BE BUILD/RUN WITH DOCKER**
 
   To build:
   ```sh
@@ -93,6 +93,21 @@ This application is an **MAVEN APPLICATION USING THE MAVEN WRAPPER**;
   ```sh
   $ docker run --rm -it -p 8080:8080 encrypto:latest
   ```
+  Available on port: 8080
+
+* **FE BUILD/RUN WITH WEBPACK**
+
+  To build:
+  ```sh
+  $ npm run build
+  ```
+
+  To run:
+  ```sh
+  $ npm run serve
+  ```
+
+  Available on port: 9000
 
 ### Todos
 

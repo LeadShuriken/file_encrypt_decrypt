@@ -1,8 +1,8 @@
-function getFileName(str) {
+export function getFileName(str) {
     return str.split('.').slice(0, -1).join('.');
 }
 
-function download(data, filename, type) {
+export function download(data, filename, type) {
     var file = new Blob([data], { type: type });
     if (window.navigator.msSaveOrOpenBlob)
         window.navigator.msSaveOrOpenBlob(file, filename);
@@ -26,12 +26,12 @@ function download(data, filename, type) {
     }
 }
 
-function convertStringToUintArray(str) {
+export function convertStringToUintArray(str) {
     var encoder = new TextEncoder("utf-8");
     return encoder.encode(encodeURIComponent(str));
 }
 
-function convertUintArraytoString(buffer) {
+export function convertUintArraytoString(buffer) {
     var decoder = new TextDecoder("utf-8");
     return decodeURIComponent(decoder.decode(buffer));
 }
@@ -44,7 +44,7 @@ function b64_to_utf8(str) {
     return decodeURIComponent(escape(window.atob(str)));
 }
 
-function arrayBufferToBase64(buffer) {
+export function arrayBufferToBase64(buffer) {
     var binary = '';
     var bytes = new Uint8Array(buffer);
     var len = bytes.byteLength;
@@ -54,7 +54,7 @@ function arrayBufferToBase64(buffer) {
     return utf8_to_b64(binary);
 }
 
-function base64ToArrayBuffer(base64) {
+export function base64ToArrayBuffer(base64) {
     var binary_string = b64_to_utf8(base64);
     var len = binary_string.length;
     var bytes = new Uint8Array(len);
@@ -64,7 +64,7 @@ function base64ToArrayBuffer(base64) {
     return bytes.buffer;
 }
 
-async function encryptMessage(key, data, iv) {
+export async function encryptMessage(key, data, iv) {
     return await window.crypto.subtle.encrypt(
         {
             name: "AES-GCM",
@@ -75,7 +75,7 @@ async function encryptMessage(key, data, iv) {
     );
 }
 
-async function decryptMessage(key, data, iv) {
+export async function decryptMessage(key, data, iv) {
     return await window.crypto.subtle.decrypt(
         {
             name: "AES-GCM",
@@ -86,7 +86,7 @@ async function decryptMessage(key, data, iv) {
     );
 }
 
-function importKeyPBKDF2(password) {
+export function importKeyPBKDF2(password) {
     return window.crypto.subtle.importKey(
         "raw",
         convertStringToUintArray(password),
@@ -95,7 +95,7 @@ function importKeyPBKDF2(password) {
         ["deriveKey"]);
 }
 
-function deriveKey(passwordKey, salt, usage) {
+export function deriveKey(passwordKey, salt, usage) {
     return window.crypto.subtle.deriveKey(
         {
             name: "PBKDF2",

@@ -7,14 +7,12 @@ import com.encrypto.models.RedisProps;
 
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
@@ -32,11 +30,6 @@ public class EncryptoController {
         this.redisProps = redisProps;
         this.opps = opps;
         this.enc = enc;
-    }
-
-    // @GetMapping("get")
-    public @ResponseBody Flux<FileStamp> all() {
-        return opps.keys("*").flatMap(opps.opsForValue()::get);
     }
 
     @PostMapping("decrypt")

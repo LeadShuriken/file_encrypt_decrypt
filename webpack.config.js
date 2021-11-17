@@ -1,11 +1,11 @@
 
 const webpack = require('webpack');
 const moment = require('moment');
+const path = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
 
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
-const CopyPlugin = require("copy-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -13,26 +13,30 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-const RFOLDER = './src/main/resources/';
+const CONF_FOLDER = './src/main/resources/';
+const RFOLDER = './static';
 const APPLICATION = yaml.load(
-    fs.readFileSync(`${RFOLDER}application.yml`, 'utf8')
+    fs.readFileSync(`${CONF_FOLDER}application.yml`, 'utf8')
 );
 
 module.exports = {
     mode: 'production',
+    output: {
+        path: path.resolve(__dirname, 'public'),
+    },
+    devServer: {
+        port: 9000
+    },
     plugins: [
         new webpack.DefinePlugin({
             PRODUCTION: JSON.stringify(true),
             R53: JSON.stringify(APPLICATION.api.r53)
         }),
-        new CopyPlugin({
-            patterns: [{ from: `${RFOLDER}static/js/worker.js`, to: "worker.js" }]
-        }),
         new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: `${RFOLDER}static/index.html`,
+            template: `${RFOLDER}/index.html`,
             title: 'Example Application',
             inject: 'body'
         }),
@@ -73,11 +77,15 @@ module.exports = {
         ]
     },
     entry: {
-        aes: `${RFOLDER}static/js/aes-gcm.js`,
-        handlers: {
+        aes: `${RFOLDER}/js/aes-gcm.js`,
+        worker: {
             dependOn: ['aes'],
-            import: `${RFOLDER}static/js/handlers.js`,
+            import: `${RFOLDER}/js/worker.js`,
         },
-        main: `${RFOLDER}static/css/main.css`
+        handlers: {
+            dependOn: ['worker'],
+            import: `${RFOLDER}/js/handlers.js`,
+        },
+        main: `${RFOLDER}/css/main.css`
     }
 };

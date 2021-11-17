@@ -4,13 +4,11 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <title>Encrypto</title>
-    <link rel="stylesheet"
-        th:href="@{/webjars/bootstrap/{version}/css/bootstrap.min.css(version=${@webJarsConfig.bootstrap})}" />
-    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@BOOTSTRAP_VERSION/dist/css/bootstrap.min.css" />
 </head>
 
 <body>
-    <div class="sidenav">
+    <div class=" sidenav">
         <div class="login-main-text">
             <h2>Encrypto</h2>
             <br>
@@ -87,13 +85,13 @@
                         <textarea class="form-control" id="textArea" rows="2" disabled></textarea>
                     </div>
 
-                    <div th:with="maxDuration=${@redisProps.ttlMax.toHours()}" class="form-group low">
+                    <div class="form-group low">
                         <div class='hours-set'>
                             <label for="formControlRange">Hours to decrypt:&nbsp;</label><span id='rangeTime'
-                                th:text='${maxDuration}'></span>
+                                text=REDIS_TTL_MAX></span>
                         </div>
-                        <input disabled type="range" step="0.5" th:max="${maxDuration}" th:value="${maxDuration}"
-                            th:min="${@redisProps.ttlMin.toHours()}" class="form-control-range" id="formControlRange">
+                        <input disabled type="range" step="0.5" max=REDIS_TTL_MAX value=REDIS_TTL_MAX min=REDIS_TTL_MIN
+                            class="form-control-range" id="formControlRange">
                     </div>
 
                     <div class="lower">
@@ -105,13 +103,9 @@
             </div>
         </div>
     </div>
-
-    <script th:src="@{/webjars/jquery/{version}/jquery.min.js(version=${@webJarsConfig.jquery})}"></script>
-    <script th:src="@{/webjars/bootstrap/{version}/js/bootstrap.min.js(version=${@webJarsConfig.bootstrap})}"></script>
-
-    <script th:src="@{/js/worker.js}"></script>
-    <script th:src="@{/js/aes-gcm.js}"></script>
-    <script th:src="@{/js/handlers.js}"></script>
+    <script src="https://code.jquery.com/jquery-JQUERY_VERSION.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@BOOTSTRAP_VERSION/dist/js/bootstrap.min.js"></script>
+    <script defer="defer" src="worker.js"></script>
 </body>
 
 </html>

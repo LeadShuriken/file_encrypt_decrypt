@@ -1,3 +1,6 @@
+import * as aes from './aes-gcm';
+import { getWorkerJS } from './worker';
+
 $(document).on('change', '.btn-file :file', function () {
     var input = $(this),
         numFiles = input.get(0).files ? input.get(0).files.length : 1,
@@ -49,17 +52,17 @@ $(document).ready(function () {
     $("#encrypt").button().click(async function () {
         const password = textArea.val();
         const file = document.getElementById('fileinput').files[0];
-        let name = getFileName(file.name);
+        let name = aes.getFileName(file.name);
 
         const salt = window.crypto.getRandomValues(new Uint8Array(8));
         const pepper = window.crypto.getRandomValues(new Uint8Array(8));
         const iv = window.crypto.getRandomValues(new Uint8Array(32));
 
-        const importedPassKey = await importKeyPBKDF2(password);
-        const rawPasswordKey = await deriveKey(importedPassKey, salt, ["encrypt"]);
-        const oppsKey = await deriveKey(importedPassKey, pepper, ["encrypt"]);
+        const importedPassKey = await aes.importKeyPBKDF2(password);
+        const rawPasswordKey = await aes.deriveKey(importedPassKey, salt, ["encrypt"]);
+        const oppsKey = await aes.deriveKey(importedPassKey, pepper, ["encrypt"]);
 
-        encryptMessage(rawPasswordKey, convertStringToUintArray(name), iv)
+        aes.encryptMessage(rawPasswordKey, aes.convertStringToUintArray(name), iv)
             .then(function (ab) {
 
                 const encryptedContentArr = new Uint8Array(ab);
@@ -69,9 +72,9 @@ $(document).ready(function () {
                 buff.set(salt, 0);
                 buff.set(encryptedContentArr, salt.byteLength);
 
-                encryptMessage(oppsKey, buff, iv)
+                aes.encryptMessage(oppsKey, buff, iv)
                     .then(function (ab2) {
-                        name = arrayBufferToBase64(ab2);
+                        name = aes.arrayBufferToBase64(ab2);
 
                         $.ajax({
                             type: 'POST',
@@ -82,13 +85,13 @@ $(document).ready(function () {
                                 name,
                                 password,
                                 expiration: rangeTime.text() * 3600,
-                                iv: arrayBufferToBase64(iv),
-                                salt: arrayBufferToBase64(pepper)
+                                iv: aes.arrayBufferToBase64(iv),
+                                salt: aes.arrayBufferToBase64(pepper)
                             }),
                             success: function (res2) {
                                 if (res2) {
                                     worker.onmessage = function (evt) {
-                                        download(
+                                        aes.download(
                                             evt.data,
                                             name.replaceAll('/', '_'),
                                             file.type)
@@ -104,7 +107,7 @@ $(document).ready(function () {
     $("#decrypt").button().click(function () {
         const password = textArea.val();
         const file = document.getElementById('fileinput').files[0];
-        const name = getFileName(file.name).replaceAll('_', '/');
+        const name = aes.getFileName(file.name).replaceAll('_', '/');
 
         $.ajax({
             type: 'POST',
@@ -117,24 +120,24 @@ $(document).ready(function () {
             }),
             success: function (res) {
                 if (res) {
-                    const iv = base64ToArrayBuffer(res.iv);
-                    const pepper = base64ToArrayBuffer(res.salt);
+                    const iv = aes.base64ToArrayBuffer(res.iv);
+                    const pepper = aes.base64ToArrayBuffer(res.salt);
 
-                    importKeyPBKDF2(password).then(function (pk) {
+                    aes.importKeyPBKDF2(password).then(function (pk) {
 
-                        deriveKey(pk, pepper, ["decrypt"]).then(function (passwordKey) {
+                        aes.deriveKey(pk, pepper, ["decrypt"]).then(function (passwordKey) {
 
-                            const encryptedDataBuff = base64ToArrayBuffer(res.name);
+                            const encryptedDataBuff = aes.base64ToArrayBuffer(res.name);
 
-                            decryptMessage(passwordKey, encryptedDataBuff, iv).then(function (decrDataBuff) {
+                            aes.decryptMessage(passwordKey, encryptedDataBuff, iv).then(function (decrDataBuff) {
 
                                 const salt = decrDataBuff.slice(0, 8);
-                                deriveKey(pk, salt, ["decrypt"]).then(function (aesKey) {
+                                aes.deriveKey(pk, salt, ["decrypt"]).then(function (aesKey) {
 
                                     const encName = decrDataBuff.slice(8);
-                                    decryptMessage(aesKey, encName, iv).then(function (decr) {
+                                    aes.decryptMessage(aesKey, encName, iv).then(function (decr) {
                                         worker.onmessage = function (evt) {
-                                            download(evt.data, convertUintArraytoString(decr), file.type);
+                                            aes.download(evt.data, aes.convertUintArraytoString(decr), file.type);
                                         };
                                         worker.postMessage([file, iv, aesKey, false]);
                                     })
