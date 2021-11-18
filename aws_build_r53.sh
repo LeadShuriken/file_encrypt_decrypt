@@ -8,11 +8,9 @@ function prop {
 
 function set_dns_policy() {
     local json_file=`mktemp`
-    sed -e "s/HOZTED_ZONE_ID/$1/g" \
-        -e "s/DNS_NAME/$2/g" \
-        -e "s/DOMAIN_NAME/$3/g" $5 > $json_file
+    sed -e $1 $3 > $json_file
     aws route53 change-resource-record-sets \
-            --hosted-zone-id $4 \
+            --hosted-zone-id $2 \
             --change-batch file://$json_file
     rm $json_file
 }
@@ -21,11 +19,32 @@ function set_dns_policy() {
 B_NAME=encrypto_r53
 ACCOUNT_ID=$(prop 'account.id')
 DEPLOY_REGION=$(prop 'account.region')
-HOZTED_ZONE_ID=$(prop ''$B_NAME'.hosted_zone_id')
+HOSTED_ZONE_ID=$(prop ''$B_NAME'.hosted_zone_id')
 DNS_ZONE_ID=$(prop ''$B_NAME'.dns_zone_id')
 DOMAIN_NAME=$(prop ''$B_NAME'.domain_name')
 DNS_NAME=$(prop ''$B_NAME'.dns_name')
 POLICY_BATCH=$(prop ''$B_NAME'.dns_s3_policy')
+CER_VAL_BATCH=$(prop ''$B_NAME'.cer_valid_policy')
+TLSC_TOKEN=$(prop ''$B_NAME'.tlsc_token')
 
+# set_dns_policy 's/#1#/'$DNS_ZONE_ID'/g;s/##2##/'$DNS_NAME'/g;s/#3#/'$DOMAIN_NAME'/g;' \
+#             $HOSTED_ZONE_ID $POLICY_BATCH
 
-set_dns_policy $DNS_ZONE_ID $DNS_NAME $DOMAIN_NAME $HOZTED_ZONE_ID $POLICY_BATCH
+ARN_ID=$(aws acm request-certificate --domain-name www.$DOMAIN_NAME \
+        --validation-method DNS \
+        --idempotency-token $TLSC_TOKEN \
+        --subject-alternative-names $DOMAIN_NAME \
+        --query "CertificateArn" \
+        | tr -d '"')
+
+INVALID_CERTS=$(aws acm describe-certificate \
+        --certificate-arn $ARN_ID \
+        --query 'Certificate.DomainValidationOptions[*].ResourceRecord')
+
+for row in $(echo "$INVALID_CERTS" | jq -r '.[] | @base64'); do
+    _jq() { 
+        echo ${row} | base64 --decode | jq -r ${1} 
+    }
+    set_dns_policy 's/#1#/'$(_jq '.Name')'/g;s/#2#/'$(_jq '.Value')'/g;' \
+    $HOSTED_ZONE_ID $CER_VAL_BATCH
+done

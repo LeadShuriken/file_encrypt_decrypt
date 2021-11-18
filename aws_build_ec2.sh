@@ -41,10 +41,10 @@ INSTANCE_ID=$(aws ec2 run-instances \
         --subnet-id $VPC_SUBNET \
         --iam-instance-profile Name=$EC2_ROLE \
         --output text \
-        --user-data file://temp.sh \
+        --user-data file://tempbuild.sh \
         --query "Instances[*].InstanceId")
 
-unlink temp.sh
+unlink tempbuild.sh
 echo ID: $INSTANCE_ID
 
 # INSTANCE TEMPLATE IS UPDATED LOGIN OR RUN
@@ -59,10 +59,10 @@ echo ID: $INSTANCE_ID
 #     --output text)
 # ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i env/$EC2_KEY.pem 
 
-# aws ssm send-command \
-#     --document-name "AWS-RunShellScript" \
-#     --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
-#     --output text \
-#     --parameters 'commands=[
-#         "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest"
-#     ]'
+aws ssm send-command \
+    --document-name "AWS-RunShellScript" \
+    --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
+    --output text \
+    --parameters 'commands=[
+        "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest"
+    ]'
