@@ -5,7 +5,7 @@ function prop {
 }
 
 # GLOBAL SPEC
-B_NAME=encrypto_server
+B_NAME=encrypto_ec2
 ACCOUNT_ID=$(prop 'account.id')
 DEPLOY_REGION=$(prop 'account.region')
 
@@ -57,7 +57,7 @@ echo ID: $INSTANCE_ID
 #     --instance-ids $INSTANCE_ID \
 #     --query 'Reservations[*].Instances[*].PublicIpAddress' \
 #     --output text)
-# ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i $EC2_KEY.pem 
+# ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i env/$EC2_KEY.pem 
 
 # aws ssm send-command \
 #     --document-name "AWS-RunShellScript" \

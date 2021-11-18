@@ -34,10 +34,8 @@ build/
 .vscode/
 
 ### AWS ###
-env
-encrypto-pair.pem
-temp.sh
-utils.sh
+*.pem
+env/*
 
 ### WEB PACK ###
 node_modules
