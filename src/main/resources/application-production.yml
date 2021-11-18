@@ -1,0 +1,11 @@
+logging:
+  level:
+    root: ERROR
+  pattern:
+    rolling-file-name: Log-%d{yyyy-MM-dd}.%i.log
+  file:
+    name: Log.log
+    max-size: 1MB
+    total-size-cap: 10MB
+    max-history: 30
+    clean-history-on-start: true

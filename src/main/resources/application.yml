@@ -14,12 +14,17 @@ redis:
     maxWaitMillis: 100
 
 api:
-  r53: 127.0.0.1:8080
   version: v1
   maxReqPerSec: 5
-  filterOrigin: true
   allowedOrigin: 'http://localhost:9000'
 
 webjars:
   bootstrap: "5.1.0"
   jquery: "3.6.0"
+
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: development

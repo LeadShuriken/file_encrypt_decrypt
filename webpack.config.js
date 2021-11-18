@@ -20,17 +20,18 @@ const APPLICATION = yaml.load(
 );
 
 module.exports = {
-    mode: 'production',
+    mode: APPLICATION.spring.profiles.active,
     output: {
         path: path.resolve(__dirname, 'public'),
     },
     devServer: {
-        port: 9000
+        port: APPLICATION.api.allowedOrigin.split(':')[2]
     },
     plugins: [
         new webpack.DefinePlugin({
-            PRODUCTION: JSON.stringify(true),
-            R53: JSON.stringify(APPLICATION.api.r53)
+            PRODUCTION: APPLICATION.spring.profiles.active === 'production' ? true : false,
+            DEV_SERVER: JSON.stringify(`http://localhost:${APPLICATION.server.port}`),
+            API_VERSION: JSON.stringify(APPLICATION.api.version)
         }),
         new RemoveEmptyScriptsPlugin(),
         new MiniCssExtractPlugin(),
