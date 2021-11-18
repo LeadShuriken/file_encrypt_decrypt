@@ -27,4 +27,4 @@ server:
 
 spring:
   profiles:
-    active: development
+    active: @profileActive@

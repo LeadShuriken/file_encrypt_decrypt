@@ -17,10 +17,11 @@ const CONF_FOLDER = './src/main/resources/';
 const RFOLDER = './static';
 const APPLICATION = yaml.load(
     fs.readFileSync(`${CONF_FOLDER}application.yml`, 'utf8')
+        .replace('@profileActive@', '')
 );
 
-module.exports = {
-    mode: APPLICATION.spring.profiles.active,
+module.exports = (env) => ({
+    mode: env.production ? 'production' : 'development',
     output: {
         path: path.resolve(__dirname, 'public'),
     },
@@ -29,7 +30,7 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            PRODUCTION: APPLICATION.spring.profiles.active === 'production' ? true : false,
+            PRODUCTION: env.production ? true : false,
             DEV_SERVER: JSON.stringify(`http://localhost:${APPLICATION.server.port}`),
             API_VERSION: JSON.stringify(APPLICATION.api.version)
         }),
@@ -89,4 +90,4 @@ module.exports = {
         },
         main: `${RFOLDER}/css/main.css`
     }
-};
+});

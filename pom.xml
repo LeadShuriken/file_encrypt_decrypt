@@ -7,7 +7,6 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.5.3</version>
 		<relativePath/>
-		<!-- lookup parent from repository -->
 	</parent>
 	<groupId>com</groupId>
 	<artifactId>encrypto</artifactId>
@@ -17,6 +16,26 @@
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<build.profile.id>development</build.profile.id>
+				<profileActive>development</profileActive>
+			</properties>
+		</profile>
+		<profile>
+			<id>production</id>
+			<properties>
+				<build.profile.id>production</build.profile.id>
+				<profileActive>production</profileActive>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 
@@ -59,18 +78,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>5.1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.6.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 			<version>3.1.0.RELEASE</version>
@@ -98,40 +105,9 @@
 
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>com.samaxes.maven</groupId>
-				<artifactId>minify-maven-plugin</artifactId>
-				<version>1.7.6</version>
-				<executions>
-					<execution>
-						<id>default-minify</id>
-						<phase>prepare-package</phase>
-						<configuration>
-							<charset>UTF-8</charset>
-							<webappSourceDir>${basedir}/src/main/resources/static</webappSourceDir>
-							<webappTargetDir>${project.build.outputDirectory}/static</webappTargetDir>
-							<jsSourceDir>js</jsSourceDir>
-							<jsTargetDir>js</jsTargetDir>
-							<jsSourceIncludes>*.js</jsSourceIncludes>
-							<cssSourceDir>css</cssSourceDir>
-							<cssTargetDir>css</cssTargetDir>
-							<cssSourceIncludes>*.css</cssSourceIncludes>
-							<jsEngine>CLOSURE</jsEngine>
-							<skipMerge>true</skipMerge>
-							<nosuffix>true</nosuffix>
-							<verbose>true</verbose>
-						</configuration>
-						<goals>
-							<goal>minify</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
