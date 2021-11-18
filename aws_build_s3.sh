@@ -38,12 +38,12 @@ S_ENTRY=$(prop ''$B_NAME'.static_entry')
 S_ERROR=$(prop ''$B_NAME'.error_page')
 GET_POLICY=$(prop ''$B_NAME'.get_policy')
 
-# npm run build
+npm run build
 
-# aws s3api create-bucket --bucket ${DOMAIN} --region ${DEPLOY_REGION}
-# aws s3api create-bucket --bucket www.${DOMAIN} --region ${DEPLOY_REGION}
+aws s3api create-bucket --bucket ${DOMAIN} --region ${DEPLOY_REGION}
+aws s3api create-bucket --bucket www.${DOMAIN} --region ${DEPLOY_REGION}
 
-# aws s3 sync ${B_FOLDER} s3://www.${DOMAIN}
+aws s3 sync ${B_FOLDER} s3://www.${DOMAIN}
 
 block_public_access ${DOMAIN} true
 block_public_access www.${DOMAIN} false
