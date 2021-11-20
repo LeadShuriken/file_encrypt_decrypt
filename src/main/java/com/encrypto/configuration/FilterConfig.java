@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,16 +16,14 @@ public class FilterConfig {
     @Autowired
     private ApiConfig config;
 
-    @Profile("production")
     @Bean
     public FilterRegistrationBean<ApiOriginFilter> logFilter() {
         FilterRegistrationBean<ApiOriginFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new ApiOriginFilter(config));
+        registrationBean.setFilter(new ApiOriginFilter());
         registrationBean.addUrlPatterns("/" + config.getVersion() + "/*");
         return registrationBean;
     }
 
-    @Profile("development")
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

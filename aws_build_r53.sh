@@ -27,10 +27,11 @@ POLICY_BATCH=$(prop ''$B_NAME'.dns_s3_policy')
 CER_VAL_BATCH=$(prop ''$B_NAME'.cer_valid_policy')
 TLSC_TOKEN=$(prop ''$B_NAME'.tlsc_token')
 
-# S# BUCKET POLICY
+# S3 BUCKET POLICY
 set_dns_policy 's/#1#/'$DNS_ZONE_ID'/g;s/##2##/'$DNS_NAME'/g;s/#3#/'$DOMAIN_NAME'/g;' \
             $HOSTED_ZONE_ID $POLICY_BATCH
 
+# CERTIFICATES
 ARN_ID=$(aws acm request-certificate --domain-name www.$DOMAIN_NAME \
         --validation-method DNS \
         --idempotency-token $TLSC_TOKEN \
@@ -38,7 +39,6 @@ ARN_ID=$(aws acm request-certificate --domain-name www.$DOMAIN_NAME \
         --query "CertificateArn" \
         | tr -d '"')
 
-# CERTIFICATES
 INVALID_CERTS=$(aws acm describe-certificate \
         --certificate-arn $ARN_ID \
         --query 'Certificate.DomainValidationOptions[*].ResourceRecord')

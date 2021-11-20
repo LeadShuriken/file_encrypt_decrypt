@@ -78,7 +78,7 @@ $(document).ready(function () {
 
                         $.ajax({
                             type: 'POST',
-                            url: `${PRODUCTION ? '' : DEV_SERVER}/${API_VERSION}/encrypt`,
+                            url: `${PRODUCTION ? EC2_API : DEV_SERVER}/${API_VERSION}/encrypt`,
                             contentType: "application/json",
                             dataType: 'json',
                             data: JSON.stringify({
@@ -111,7 +111,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: `${PRODUCTION ? '' : DEV_SERVER}/${API_VERSION}/decrypt`,
+            url: `${PRODUCTION ? EC2_API : DEV_SERVER}/${API_VERSION}/decrypt`,
             contentType: "application/json",
             dataType: 'json',
             data: JSON.stringify({

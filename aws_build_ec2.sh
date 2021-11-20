@@ -31,6 +31,7 @@ docker push $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com/$ECR_REPO:latest
 cat dockerboot.sh > tempbuild.sh
 echo "aws ecr get-login-password --region $DEPLOY_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com" >> tempbuild.sh
 echo "docker pull $ACCOUNT_ID.dkr.ecr.$DEPLOY_REGION.amazonaws.com/$ECR_REPO:latest" >> tempbuild.sh
+echo "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest" >> tempbuild.sh
 
 INSTANCE_ID=$(aws ec2 run-instances \
         --image-id $AMI_OS_TYPE \
@@ -47,8 +48,7 @@ INSTANCE_ID=$(aws ec2 run-instances \
 unlink tempbuild.sh
 echo ID: $INSTANCE_ID
 
-# INSTANCE TEMPLATE IS UPDATED LOGIN OR RUN
-
+# # INSTANCE TEMPLATE IS UPDATED LOGIN OR RUN
 # aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 # aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
 # aws ec2 wait system-status-ok --instance-ids $INSTANCE_ID
@@ -57,12 +57,12 @@ echo ID: $INSTANCE_ID
 #     --instance-ids $INSTANCE_ID \
 #     --query 'Reservations[*].Instances[*].PublicIpAddress' \
 #     --output text)
-# ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i env/$EC2_KEY.pem 
+# ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i env/$EC2_KEY.pem ec2-user@$PUBLIC_IP
 
-aws ssm send-command \
-    --document-name "AWS-RunShellScript" \
-    --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
-    --output text \
-    --parameters 'commands=[
-        "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest"
-    ]'
+# aws ssm send-command \
+#     --document-name "AWS-RunShellScript" \
+#     --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
+#     --output text \
+#     --parameters 'commands=[
+#         "docker run --rm -d -p 80:8080 '$ACCOUNT_ID'.dkr.ecr.'$DEPLOY_REGION'.amazonaws.com/'$ECR_REPO':latest"
+#     ]'

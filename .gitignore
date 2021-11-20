@@ -40,4 +40,4 @@ env/*
 ### WEB PACK ###
 node_modules
 public
-src/main/java/com/encrypto/filters/ApiOriginFilter.java
+application-production.yml
